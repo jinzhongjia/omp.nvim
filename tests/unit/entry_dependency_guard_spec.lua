@@ -2,8 +2,8 @@ local assert = require('luassert')
 
 describe('entry contracts', function()
   it('keeps default keymap string actions command-routable', function()
-    local config = require('opencode.config')
-    local commands = require('opencode.commands')
+    local config = require('omp.config')
+    local commands = require('omp.commands')
     local defs = commands.get_commands()
 
     local checked = 0
@@ -24,8 +24,8 @@ describe('entry contracts', function()
   end)
 
   it('keeps builtin slash commands command-addressable', function()
-    local commands = require('opencode.commands')
-    local slash = require('opencode.commands.slash')
+    local commands = require('omp.commands')
+    local slash = require('omp.commands.slash')
     local command_defs = commands.get_commands()
 
     for slash_cmd, def in pairs(slash.get_builtin_command_definitions()) do

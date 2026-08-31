@@ -1,8 +1,8 @@
-local state = require('opencode.state')
-local renderer = require('opencode.ui.renderer')
+local state = require('omp.state')
+local renderer = require('omp.ui.renderer')
 local helpers = require('tests.helpers')
-local output_window = require('opencode.ui.output_window')
-local config = require('opencode.config')
+local output_window = require('omp.ui.output_window')
+local config = require('omp.config')
 
 local M = {
   events = {},
@@ -43,7 +43,7 @@ function M.load_events(file_path)
 end
 
 function M.setup_windows(opts)
-  require('opencode.ui.highlight').setup()
+  require('omp.ui.highlight').setup()
   helpers.replay_setup()
 
   vim.schedule(function()
@@ -179,8 +179,8 @@ end
 function M.wait_for_idle(timeout_ms)
   timeout_ms = timeout_ms or 5000
 
-  local ctx = require('opencode.ui.renderer.ctx')
-  local flush = require('opencode.ui.renderer.flush')
+  local ctx = require('omp.ui.renderer.ctx')
+  local flush = require('omp.ui.renderer.flush')
 
   return vim.wait(timeout_ms, function()
     local emitter = state.event_manager and state.event_manager.throttling_emitter

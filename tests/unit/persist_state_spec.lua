@@ -1,12 +1,12 @@
-local state = require('opencode.state')
-local store = require('opencode.state.store')
-local config = require('opencode.config')
-local api = require('opencode.api')
-local ui = require('opencode.ui.ui')
-local input_window = require('opencode.ui.input_window')
-local renderer = require('opencode.ui.renderer')
-local Promise = require('opencode.promise')
-local EventManager = require('opencode.event_manager')
+local state = require('omp.state')
+local store = require('omp.state.store')
+local config = require('omp.config')
+local api = require('omp.api')
+local ui = require('omp.ui.ui')
+local input_window = require('omp.ui.input_window')
+local renderer = require('omp.ui.renderer')
+local Promise = require('omp.promise')
+local EventManager = require('omp.event_manager')
 local stub = require('luassert.stub')
 
 -- persist_state coverage matrix
@@ -97,7 +97,6 @@ describe('persist_state', function()
   local code_buf
   local code_win
   local tmpfile
-  local original_opencode_server_new
 
   local function setup_ui(opts)
     local ui_opts = vim.tbl_deep_extend('force', {
@@ -185,37 +184,23 @@ describe('persist_state', function()
     state.ui.clear_hidden_window_state()
     store.set('current_code_view', nil)
     store.set('current_code_buf', nil)
-    store.set('last_code_win_before_opencode', nil)
+    store.set('last_code_win_before_omp', nil)
     state.session.set_active(nil)
     state.renderer.set_messages({})
 
-    -- Mock opencode_server to prevent spawning real process in CI
-    local opencode_server = require('opencode.opencode_server')
-    original_opencode_server_new = opencode_server.new
-    local mock_server = {
-      url = 'http://127.0.0.1:4000',
+    local mock_manager = {
+      url = 'stdio://omp',
       is_running = function()
         return true
       end,
-      check_health = function()
-        return Promise.new():resolve(true)
-      end,
-      spawn = function() end,
-      shutdown = function()
-        return Promise.new():resolve(true)
-      end,
-      get_spawn_promise = function()
-        return Promise.new():resolve(mock_server)
+      get_spawn_promise = function(self)
+        return Promise.new():resolve(self)
       end,
       get_shutdown_promise = function()
         return Promise.new():resolve(true)
       end,
     }
-    opencode_server.new = function()
-      return mock_server
-    end
-    -- Pre-set the server to skip ensure_server
-    store.set('opencode_server', mock_server)
+    store.set('rpc_manager', mock_manager)
   end)
 
   after_each(function()
@@ -245,14 +230,9 @@ describe('persist_state', function()
     config.values = original_config
     store.set('current_code_view', nil)
     store.set('current_code_buf', nil)
-    store.set('last_code_win_before_opencode', nil)
+    store.set('last_code_win_before_omp', nil)
     state.ui.clear_hidden_window_state()
-
-    -- Restore mocked opencode_server
-    if original_opencode_server_new then
-      local opencode_server = require('opencode.opencode_server')
-      opencode_server.new = original_opencode_server_new
-    end
+    state.jobs.set_rpc_manager(nil)
   end)
 
   describe('configuration', function()
@@ -395,7 +375,7 @@ describe('persist_state', function()
       state.session.set_active({ id = 'sess1' })
       toggle_wait('visible')
 
-      local question_window = require('opencode.ui.question_window')
+      local question_window = require('omp.ui.question_window')
       question_window.show_question({
         id = 'question_restore_hidden',
         sessionID = 'sess1',
@@ -406,7 +386,7 @@ describe('persist_state', function()
           },
         },
       })
-      require('opencode.ui.renderer.flush').flush()
+      require('omp.ui.renderer.flush').flush()
 
       question_window._dialog:set_selection(2)
       question_window._dialog:select()
@@ -450,7 +430,7 @@ describe('persist_state', function()
       toggle_wait('visible')
 
       local output_buf = state.windows.output_buf
-      local contextual_actions = require('opencode.ui.contextual_actions')
+      local contextual_actions = require('omp.ui.contextual_actions')
       contextual_actions.show_contextual_actions_menu(output_buf, {
         { key = 'a', text = 'Temporary A', display_line = 0 },
       }, vim.api.nvim_create_namespace('persist-state-mapping-test'))

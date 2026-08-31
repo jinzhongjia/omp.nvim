@@ -1,18 +1,18 @@
 local assert = require('luassert')
 
 local function clear_command_packages()
-  package.loaded['opencode.commands'] = nil
-  package.loaded['opencode.commands.parse'] = nil
-  package.loaded['opencode.commands.dispatch'] = nil
-  package.loaded['opencode.commands.complete'] = nil
+  package.loaded['omp.commands'] = nil
+  package.loaded['omp.commands.parse'] = nil
+  package.loaded['omp.commands.dispatch'] = nil
+  package.loaded['omp.commands.complete'] = nil
 
-  package.loaded['opencode.commands.handlers.window'] = nil
-  package.loaded['opencode.commands.handlers.workflow'] = nil
-  package.loaded['opencode.commands.handlers.session'] = nil
-  package.loaded['opencode.commands.handlers.diff'] = nil
-  package.loaded['opencode.commands.handlers.surface'] = nil
-  package.loaded['opencode.commands.handlers.agent'] = nil
-  package.loaded['opencode.commands.handlers.permission'] = nil
+  package.loaded['omp.commands.handlers.window'] = nil
+  package.loaded['omp.commands.handlers.workflow'] = nil
+  package.loaded['omp.commands.handlers.session'] = nil
+  package.loaded['omp.commands.handlers.diff'] = nil
+  package.loaded['omp.commands.handlers.surface'] = nil
+  package.loaded['omp.commands.handlers.agent'] = nil
+  package.loaded['omp.commands.handlers.permission'] = nil
 end
 
 describe('commands axis contract', function()
@@ -28,7 +28,7 @@ describe('commands axis contract', function()
   end)
 
   it('parse returns ParsedIntent without execute injection', function()
-    local parse = require('opencode.commands.parse')
+    local parse = require('omp.commands.parse')
 
     local parsed = parse.command({ args = 'toggle foo bar', range = 0 }, {
       toggle = { desc = 'toggle' },
@@ -45,7 +45,7 @@ describe('commands axis contract', function()
   it('binds ActionContext only in init and dispatches via execute(ctx)', function()
     local captured_ctx
 
-    package.loaded['opencode.commands.parse'] = {
+    package.loaded['omp.commands.parse'] = {
       command = function()
         return {
           ok = true,
@@ -59,14 +59,14 @@ describe('commands axis contract', function()
       end,
     }
 
-    package.loaded['opencode.commands.dispatch'] = {
+    package.loaded['omp.commands.dispatch'] = {
       execute = function(ctx)
         captured_ctx = ctx
         return { ok = true, result = 'done' }
       end,
     }
 
-    package.loaded['opencode.commands.complete'] = {
+    package.loaded['omp.commands.complete'] = {
       complete_command = function() return {} end,
     }
 
@@ -74,7 +74,7 @@ describe('commands axis contract', function()
       return args[1]
     end
 
-    package.loaded['opencode.commands.handlers.window'] = {
+    package.loaded['omp.commands.handlers.window'] = {
       command_defs = {
         toggle = {
           desc = 'toggle',
@@ -82,14 +82,14 @@ describe('commands axis contract', function()
         },
       },
     }
-    package.loaded['opencode.commands.handlers.workflow'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.session'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.diff'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.surface'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.agent'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.permission'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.workflow'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.session'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.diff'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.surface'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.agent'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.permission'] = { command_defs = {} }
 
-    local commands = require('opencode.commands')
+    local commands = require('omp.commands')
     local result = commands.execute_command_opts({ args = 'toggle a', range = 0 })
 
     assert.equal('done', result)
@@ -99,8 +99,8 @@ describe('commands axis contract', function()
   end)
 
   it('binds run/review/quick_chat intents through one axis', function()
-    package.loaded['opencode.commands.handlers.window'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.workflow'] = {
+    package.loaded['omp.commands.handlers.window'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.workflow'] = {
       command_defs = {
         run = {
           desc = 'run',
@@ -122,14 +122,14 @@ describe('commands axis contract', function()
         },
       },
     }
-    package.loaded['opencode.commands.handlers.session'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.diff'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.surface'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.agent'] = { command_defs = {} }
-    package.loaded['opencode.commands.handlers.permission'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.session'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.diff'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.surface'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.agent'] = { command_defs = {} }
+    package.loaded['omp.commands.handlers.permission'] = { command_defs = {} }
 
-    local commands = require('opencode.commands')
-    local dispatch = require('opencode.commands.dispatch')
+    local commands = require('omp.commands')
+    local dispatch = require('omp.commands.dispatch')
     dispatch.reset_hooks_for_test()
 
     local matrix = {

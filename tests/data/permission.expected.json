@@ -5,19 +5,6 @@
         "msg_9d6f253910015UFmkGkiWtUsRW"
       ],
       "display_line": 4,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_9d6f253910015UFmkGkiWtUsRW"
-      ],
-      "display_line": 4,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,58 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_9d6f253910015UFmkGkiWtUsRW"
-      ],
-      "display_line": 4,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
-    },
-    {
-      "args": [
-        "c78fb2dd2d533cfe530692cc3e3c8f92a0e4af1d"
-      ],
-      "display_line": 14,
-      "key": "R",
-      "range": {
-        "from": 14,
-        "to": 14
-      },
-      "text": "[R]evert file",
-      "type": "diff_revert_selected_file"
-    },
-    {
-      "args": [
-        "c78fb2dd2d533cfe530692cc3e3c8f92a0e4af1d"
-      ],
-      "display_line": 14,
-      "key": "A",
-      "range": {
-        "from": 14,
-        "to": 14
-      },
-      "text": "Revert [A]ll",
-      "type": "diff_revert_all"
-    },
-    {
-      "args": [
-        "c78fb2dd2d533cfe530692cc3e3c8f92a0e4af1d"
-      ],
-      "display_line": 14,
-      "key": "D",
-      "range": {
-        "from": 14,
-        "to": 14
-      },
-      "text": "[D]iff",
-      "type": "diff_open"
     }
   ],
   "extmarks": [
@@ -91,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_9d6f253910015UFmkGkiWtUsRW]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +64,7 @@
         "virt_text": [
           [
             " 2025-10-12 05:43:49",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -148,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -168,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -188,25 +123,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/claude-sonnet-4.5",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_9d6f253df001TjqxW12FAjGf5s]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -226,7 +161,7 @@
         "virt_text": [
           [
             " 2025-10-12 05:43:49",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -245,7 +180,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -265,7 +200,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -285,7 +220,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -305,7 +240,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -325,7 +260,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -336,7 +271,7 @@
     ],
     [
       12,
-      17,
+      15,
       0,
       {
         "ns_id": 3,
@@ -345,25 +280,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/claude-sonnet-4.5",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_9d6f27f4800103Tp3N6i6JW53p]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -374,7 +309,7 @@
     ],
     [
       13,
-      17,
+      15,
       0,
       {
         "ns_id": 3,
@@ -383,7 +318,7 @@
         "virt_text": [
           [
             " 2025-10-12 05:44:00",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -407,8 +342,6 @@
     ":)",
     "`````",
     "",
-    "**󰻛  Created Snapshot** `c78fb2dd`",
-    "",
     "----",
     "",
     "",
@@ -417,11 +350,11 @@
   "timestamp": 1770935239,
   "window": {
     "cursor": [
-      19,
+      17,
       0
     ],
-    "effective_bottom": 19,
-    "line_count": 20,
-    "visible_bottom": 20
+    "effective_bottom": 17,
+    "line_count": 18,
+    "visible_bottom": 18
   }
 }

@@ -5,19 +5,6 @@
         "msg_001"
       ],
       "display_line": 10,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 10
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_001"
-      ],
-      "display_line": 10,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,19 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_001"
-      ],
-      "display_line": 10,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 10
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
     }
   ],
   "extmarks": [
@@ -52,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_001]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -90,7 +64,7 @@
         "virt_text": [
           [
             " 2025-10-09 08:53:21",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -109,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -149,7 +123,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -169,7 +143,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -189,7 +163,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -209,7 +183,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -229,7 +203,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -249,7 +223,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -269,25 +243,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_002]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -307,7 +281,7 @@
         "virt_text": [
           [
             " 2025-10-09 08:53:22",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -326,25 +300,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_004]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -364,7 +338,7 @@
         "virt_text": [
           [
             " 2025-10-09 08:53:24",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,

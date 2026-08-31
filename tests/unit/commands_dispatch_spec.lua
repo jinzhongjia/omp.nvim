@@ -1,11 +1,11 @@
 local assert = require('luassert')
-local command_dispatch = require('opencode.commands.dispatch')
-local command_parse = require('opencode.commands.parse')
-local commands = require('opencode.commands')
-local config = require('opencode.config')
-local state = require('opencode.state')
+local command_dispatch = require('omp.commands.dispatch')
+local command_parse = require('omp.commands.parse')
+local commands = require('omp.commands')
+local config = require('omp.config')
+local state = require('omp.state')
 
-describe('opencode.commands.dispatch', function()
+describe('omp.commands.dispatch', function()
   local original_hooks
   local original_event_manager
 
@@ -19,13 +19,15 @@ describe('opencode.commands.dispatch', function()
   end
 
   ---@param overrides? table
-  ---@return OpencodeCommandParseResult
+  ---@return OmpCommandParseResult
   local function make_parsed(overrides)
     local defaults = {
       ok = true,
       intent = {
         name = 'toggle',
-        execute = function() return 'ok' end,
+        execute = function()
+          return 'ok'
+        end,
         args = {},
         range = nil,
         source = {
@@ -37,9 +39,9 @@ describe('opencode.commands.dispatch', function()
     return vim.tbl_deep_extend('force', defaults, overrides or {})
   end
 
-  ---@param parsed OpencodeCommandParseResult
-  ---@param execute_override? fun(args: string[], range: OpencodeSelectionRange|nil): any
-  ---@return OpencodeCommandActionContext
+  ---@param parsed OmpCommandParseResult
+  ---@param execute_override? fun(args: string[], range: OmpSelectionRange|nil): any
+  ---@return OmpCommandActionContext
   local function make_ctx(parsed, execute_override)
     return commands.bind_action_context(parsed, execute_override)
   end
@@ -75,7 +77,9 @@ describe('opencode.commands.dispatch', function()
     local parsed = make_parsed({
       intent = {
         name = 'toggle',
-        execute = function() return 'done' end,
+        execute = function()
+          return 'done'
+        end,
         args = {},
       },
     })
@@ -88,17 +92,16 @@ describe('opencode.commands.dispatch', function()
     assert.same({}, result.intent.args)
   end)
 
-  it('normalizes handler argument errors as fail result', function()
+  it('rejects removed snapshot commands', function()
     local parsed = command_parse.command({ args = 'revert all', range = 0 }, commands.get_commands())
-
     local result = command_dispatch.execute(make_ctx(parsed))
 
     assert.is_false(result.ok)
     assert.same({
-      code = 'invalid_arguments',
-      message = 'Invalid revert target. Use: prompt, session, or <snapshot_id>',
+      code = 'unknown_subcommand',
+      message = 'Unknown subcommand: revert',
+      subcommand = 'revert',
     }, result.error)
-    assert.equal('revert', result.intent.name)
   end)
 
   it('fails with invalid_arguments when permission subcommand is unknown after bind', function()
@@ -202,7 +205,9 @@ describe('opencode.commands.dispatch', function()
     local parsed = make_parsed({
       intent = {
         name = 'toggle',
-        execute = function() return 'ok' end,
+        execute = function()
+          return 'ok'
+        end,
       },
     })
 
@@ -242,13 +247,17 @@ describe('opencode.commands.dispatch', function()
     local toggle_parsed = make_parsed({
       intent = {
         name = 'toggle',
-        execute = function() return 'toggle' end,
+        execute = function()
+          return 'toggle'
+        end,
       },
     })
     local run_parsed = make_parsed({
       intent = {
         name = 'run',
-        execute = function() return 'run' end,
+        execute = function()
+          return 'run'
+        end,
       },
     })
 
@@ -282,7 +291,9 @@ describe('opencode.commands.dispatch', function()
       intent = {
         name = 'select_session',
         hook_key = 'session',
-        execute = function() return 'ok' end,
+        execute = function()
+          return 'ok'
+        end,
       },
     })
 
@@ -290,5 +301,4 @@ describe('opencode.commands.dispatch', function()
     assert.is_true(result.ok)
     assert.same({ 'group:select_session', 'name:select_session' }, seen)
   end)
-
 end)

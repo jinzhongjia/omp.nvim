@@ -1,5 +1,5 @@
 local assert = require('luassert')
-local Promise = require('opencode.promise')
+local Promise = require('omp.promise')
 
 describe('slash command mapping', function()
   local slash
@@ -14,7 +14,7 @@ describe('slash command mapping', function()
     captured_ctx = {}
     user_commands = nil
 
-    package.loaded['opencode.commands'] = {
+    package.loaded['omp.commands'] = {
       get_commands = function()
         return {
           agent = { desc = 'Agent', nargs = '*' },
@@ -54,7 +54,7 @@ describe('slash command mapping', function()
       end,
     }
 
-    package.loaded['opencode.config_file'] = {
+    package.loaded['omp.config_file'] = {
       get_user_commands = function()
         local p = Promise.new()
         p:resolve(user_commands)
@@ -62,23 +62,23 @@ describe('slash command mapping', function()
       end,
     }
 
-    package.loaded['opencode.log'] = {
+    package.loaded['omp.log'] = {
       notify = function() end,
     }
 
     vim.notify = function() end
 
-    package.loaded['opencode.commands.slash'] = nil
-    slash = require('opencode.commands.slash')
+    package.loaded['omp.commands.slash'] = nil
+    slash = require('omp.commands.slash')
   end)
 
   after_each(function()
     vim.notify = original_notify
 
-    package.loaded['opencode.commands'] = nil
-    package.loaded['opencode.commands.slash'] = nil
-    package.loaded['opencode.config_file'] = nil
-    package.loaded['opencode.log'] = nil
+    package.loaded['omp.commands'] = nil
+    package.loaded['omp.commands.slash'] = nil
+    package.loaded['omp.config_file'] = nil
+    package.loaded['omp.log'] = nil
   end)
 
   it('maps builtin preset /agent to ParsedIntent and dispatches', function()

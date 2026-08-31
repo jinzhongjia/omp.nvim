@@ -1,7 +1,7 @@
-local EventManager = require('opencode.event_manager')
-local Promise = require('opencode.promise')
-local state = require('opencode.state')
-local config = require('opencode.config')
+local EventManager = require('omp.event_manager')
+local Promise = require('omp.promise')
+local state = require('omp.state')
+local config = require('omp.config')
 
 describe('EventManager', function()
   local event_manager
@@ -142,7 +142,7 @@ describe('EventManager', function()
     assert.are.equal(first_start, event_manager.is_started)
   end)
 
-  it('does not duplicate opencode_server listener across restart', function()
+  it('does not duplicate rpc_manager listener across restart', function()
     local original_defer_fn = vim.defer_fn
     vim.defer_fn = function(fn, _)
       fn()
@@ -162,7 +162,7 @@ describe('EventManager', function()
     end
 
     local fake_server = {
-      url = 'http://127.0.0.1:4000',
+      url = 'stdio://omp',
       get_spawn_promise = function(self)
         return resolved(self)
       end,
@@ -171,13 +171,13 @@ describe('EventManager', function()
       end,
     }
 
-    state.jobs.clear_server()
+    state.jobs.set_rpc_manager(nil)
 
     event_manager:start()
     event_manager:stop()
     event_manager:start()
 
-    state.jobs.set_server(fake_server)
+    state.jobs.set_rpc_manager(fake_server)
 
     vim.wait(200, function()
       return subscribe_calls > 0
@@ -185,7 +185,7 @@ describe('EventManager', function()
 
     assert.are.equal(1, subscribe_calls)
 
-    state.jobs.clear_server()
+    state.jobs.set_rpc_manager(nil)
     event_manager._subscribe_to_server_events = original_subscribe_to_server_events
     vim.defer_fn = original_defer_fn
   end)
@@ -283,7 +283,7 @@ describe('EventManager', function()
       local autocmd_data = nil
 
       local autocmd_id = vim.api.nvim_create_autocmd('User', {
-        pattern = 'OpencodeEvent:test_event',
+        pattern = 'OmpEvent:test_event',
         callback = function(args)
           autocmd_called = true
           autocmd_data = args.data
@@ -311,7 +311,7 @@ describe('EventManager', function()
       local autocmd_called = false
 
       local autocmd_id = vim.api.nvim_create_autocmd('User', {
-        pattern = 'OpencodeEvent:orphan_event',
+        pattern = 'OmpEvent:orphan_event',
         callback = function(args)
           autocmd_called = true
         end,

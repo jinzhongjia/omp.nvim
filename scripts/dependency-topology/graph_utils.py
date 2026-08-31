@@ -2,7 +2,7 @@
 """Repository-local static Lua dependency graph helpers.
 
 Mechanism only:
-- Parse `require('opencode.*')` edges from `lua/opencode/**/*.lua`
+- Parse `require('omp.*')` and legacy `require('opencode.*')` edges
 - Build snapshot graph from worktree or git ref
 - Provide SCC / back-edge utilities
 """
@@ -18,8 +18,8 @@ from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 
 REQUIRE_PATTERNS = [
-    re.compile(r"require\s*\(\s*['\"](opencode(?:\.[^'\"]+)?)['\"]\s*\)"),
-    re.compile(r"require\s+['\"](opencode(?:\.[^'\"]+)?)['\"]"),
+    re.compile(r"require\s*\(\s*['\"]((?:omp|opencode)(?:\.[^'\"]+)?)['\"]\s*\)"),
+    re.compile(r"require\s+['\"]((?:omp|opencode)(?:\.[^'\"]+)?)['\"]"),
 ]
 
 
@@ -32,7 +32,9 @@ class SnapshotGraph:
 
 
 def module_from_relpath(relpath: str) -> Optional[str]:
-    if not relpath.startswith("lua/opencode/") or not relpath.endswith(".lua"):
+    if not relpath.endswith(".lua") or not (
+        relpath.startswith("lua/omp/") or relpath.startswith("lua/opencode/")
+    ):
         return None
     mod = relpath[len("lua/") : -len(".lua")]
     if mod.endswith("/init"):
@@ -42,16 +44,19 @@ def module_from_relpath(relpath: str) -> Optional[str]:
 
 def _worktree_files(repo: Path) -> List[Tuple[str, str]]:
     out: List[Tuple[str, str]] = []
-    base = repo / "lua" / "opencode"
-    for fp in base.rglob("*.lua"):
-        rel = fp.relative_to(repo).as_posix()
-        text = fp.read_text(encoding="utf-8", errors="ignore")
-        out.append((rel, text))
+    for namespace in ("omp", "opencode"):
+        base = repo / "lua" / namespace
+        if not base.exists():
+            continue
+        for fp in base.rglob("*.lua"):
+            rel = fp.relative_to(repo).as_posix()
+            text = fp.read_text(encoding="utf-8", errors="ignore")
+            out.append((rel, text))
     return out
 
 
 def _git_files(repo: Path, ref: str) -> List[Tuple[str, str]]:
-    cmd = ["git", "ls-tree", "-r", "--name-only", ref, "lua/opencode"]
+    cmd = ["git", "ls-tree", "-r", "--name-only", ref, "lua/omp", "lua/opencode"]
     try:
         ls = subprocess.check_output(cmd, cwd=repo, text=True, stderr=subprocess.PIPE)
     except subprocess.CalledProcessError as e:

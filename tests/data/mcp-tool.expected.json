@@ -5,19 +5,6 @@
         "msg_mcp_user1"
       ],
       "display_line": 4,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_mcp_user1"
-      ],
-      "display_line": 4,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,19 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_mcp_user1"
-      ],
-      "display_line": 4,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
     }
   ],
   "extmarks": [
@@ -52,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_mcp_user1]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -90,7 +64,7 @@
         "virt_text": [
           [
             " 2025-12-17 19:33:20",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -109,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -149,25 +123,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_mcp_asst1]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -187,7 +161,7 @@
         "virt_text": [
           [
             " 2025-12-17 19:33:20",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -200,7 +174,7 @@
       8,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -217,7 +191,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -231,7 +205,7 @@
       9,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -248,7 +222,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -262,7 +236,7 @@
       10,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -279,7 +253,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -293,7 +267,7 @@
       11,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -310,7 +284,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -324,7 +298,7 @@
       12,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -341,7 +315,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -355,7 +329,7 @@
       13,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -372,7 +346,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -386,7 +360,7 @@
       14,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -403,7 +377,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -417,7 +391,7 @@
       15,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -434,7 +408,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -448,7 +422,7 @@
       16,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -465,7 +439,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -479,7 +453,7 @@
       17,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -496,7 +470,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -510,7 +484,7 @@
       18,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -527,7 +501,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -541,7 +515,7 @@
       19,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -558,7 +532,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -572,7 +546,7 @@
       20,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -589,7 +563,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -603,7 +577,7 @@
       21,
       0,
       {
-        "line_hl_group": "OpencodeHint",
+        "line_hl_group": "OmpHint",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true
@@ -620,7 +594,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,

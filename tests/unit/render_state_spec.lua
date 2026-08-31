@@ -1,5 +1,5 @@
-local RenderState = require('opencode.ui.render_state')
-local state = require('opencode.state')
+local RenderState = require('omp.ui.render_state')
+local state = require('omp.state')
 
 describe('RenderState', function()
   local render_state
@@ -250,7 +250,7 @@ describe('RenderState', function()
       assert.equals('action1', line_actions[1].type)
     end)
 
-    it('owns one R/C/F set across an actionable user message block', function()
+    it('owns one copy action across an actionable user message block', function()
       local message = {
         info = { id = 'msg-user', role = 'user' },
         parts = {
@@ -263,10 +263,10 @@ describe('RenderState', function()
       render_state:set_part(message.parts[2], 25, 26)
 
       local rendered = render_state:get_message('msg-user')
-      assert.equals(3, #rendered.actions)
+      assert.equals(1, #rendered.actions)
       assert.same({ from = 20, to = 26 }, rendered.actions[1].range)
       assert.same(
-        { 'undo', 'copy_message', 'fork_session' },
+        { 'copy_message' },
         vim.tbl_map(function(action)
           return action.type
         end, rendered.actions)
@@ -274,7 +274,7 @@ describe('RenderState', function()
 
       for line = 20, 26 do
         local actions = render_state:get_actions_at_line(line)
-        assert.equals(3, #actions)
+        assert.equals(1, #actions)
         assert.same({ 'msg-user' }, actions[1].args)
       end
     end)
@@ -372,7 +372,7 @@ describe('RenderState', function()
 
     it('adds and gets targets by line and column', function()
       render_state:add_targets('part1', {
-        target('file', 1, 3, 12, { path = 'lua/opencode/init.lua' }),
+        target('file', 1, 3, 12, { path = 'lua/omp/init.lua' }),
       })
 
       local result = render_state:get_target_at_position(1, 3)
@@ -381,7 +381,7 @@ describe('RenderState', function()
       assert.equals('file', result.kind)
       assert.equals('part1', result.part_id)
       assert.equals('msg1', result.message_id)
-      assert.equals('lua/opencode/init.lua', result.path)
+      assert.equals('lua/omp/init.lua', result.path)
       assert.is_nil(render_state:get_target_at_position(1, 12))
     end)
 

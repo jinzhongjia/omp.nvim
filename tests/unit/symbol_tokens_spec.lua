@@ -1,15 +1,15 @@
 local assert = require('luassert')
 
-local symbol_tokens = require('opencode.ui.symbol_tokens')
+local symbol_tokens = require('omp.ui.symbol_tokens')
 
-describe('opencode.ui.symbol_tokens', function()
+describe('omp.ui.symbol_tokens', function()
   it('finds plain and qualified symbol spans', function()
     local cases = {
       { line = 'foo', token = 'foo', start_pos = 1, end_pos = 3 },
       { line = 'foo: call', token = 'foo', start_pos = 1, end_pos = 3 },
       { line = 'foo:call', token = 'foo:call', start_pos = 1, end_pos = 8 },
       { line = 'A::b', token = 'A::b', start_pos = 1, end_pos = 4 },
-      { line = 'OpencodeApiClient:_call', token = 'OpencodeApiClient:_call', start_pos = 1, end_pos = 23 },
+      { line = 'OmpApiClient:_call', token = 'OmpApiClient:_call', start_pos = 1, end_pos = 18 },
       { line = 'M.actions.jump_to_file', token = 'M.actions.jump_to_file', start_pos = 1, end_pos = 22 },
       { line = 'foo.', token = 'foo', start_pos = 1, end_pos = 3 },
       { line = 'foo::', token = 'foo', start_pos = 1, end_pos = 3 },
@@ -52,7 +52,7 @@ describe('opencode.ui.symbol_tokens', function()
     assert.equal('foo', symbol_tokens.at_col('foo: call', 0))
     assert.is_nil(symbol_tokens.at_col('foo: call', 3))
     assert.equal('foo:call', symbol_tokens.at_col('foo:call', 3))
-    assert.equal('OpencodeApiClient:_call', symbol_tokens.at_col('OpencodeApiClient:_call', 18))
+    assert.equal('OmpApiClient:_call', symbol_tokens.at_col('OmpApiClient:_call', 17))
     assert.equal('A::b', symbol_tokens.at_col('A::b', 1))
     assert.equal('A::b', symbol_tokens.at_col('A::b', 2))
     assert.equal('A::b', symbol_tokens.at_col('A::b', 3))

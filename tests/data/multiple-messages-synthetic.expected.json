@@ -5,19 +5,6 @@
         "msg_005"
       ],
       "display_line": 36,
-      "key": "R",
-      "range": {
-        "from": 32,
-        "to": 36
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_005"
-      ],
-      "display_line": 36,
       "key": "C",
       "range": {
         "from": 32,
@@ -25,71 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_005"
-      ],
-      "display_line": 36,
-      "key": "F",
-      "range": {
-        "from": 32,
-        "to": 36
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
-    },
-    {
-      "args": [
-        "msg_001"
-      ],
-      "display_line": 4,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_001"
-      ],
-      "display_line": 4,
-      "key": "C",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[C]opy",
-      "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_001"
-      ],
-      "display_line": 4,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
-    },
-    {
-      "args": [
-        "msg_003"
-      ],
-      "display_line": 20,
-      "key": "R",
-      "range": {
-        "from": 16,
-        "to": 20
-      },
-      "text": "[R]evert",
-      "type": "undo"
     },
     {
       "args": [
@@ -106,16 +28,16 @@
     },
     {
       "args": [
-        "msg_003"
+        "msg_001"
       ],
-      "display_line": 20,
-      "key": "F",
+      "display_line": 4,
+      "key": "C",
       "range": {
-        "from": 16,
-        "to": 20
+        "from": 0,
+        "to": 4
       },
-      "text": "[F]ork",
-      "type": "fork_session"
+      "text": "[C]opy",
+      "type": "copy_message"
     }
   ],
   "extmarks": [
@@ -130,25 +52,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_001]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -168,7 +90,7 @@
         "virt_text": [
           [
             " 2001-09-09 01:46:41",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -187,7 +109,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -207,7 +129,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -227,25 +149,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_002]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -265,7 +187,7 @@
         "virt_text": [
           [
             " 2001-09-09 01:46:42",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -284,25 +206,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_003]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -322,7 +244,7 @@
         "virt_text": [
           [
             " 2001-09-09 01:46:43",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -341,7 +263,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -361,7 +283,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -381,25 +303,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_004]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -419,7 +341,7 @@
         "virt_text": [
           [
             " 2001-09-09 01:46:44",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -438,25 +360,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_005]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -476,7 +398,7 @@
         "virt_text": [
           [
             " 2001-09-09 01:46:45",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -495,7 +417,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -515,7 +437,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -535,25 +457,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_006]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -573,7 +495,7 @@
         "virt_text": [
           [
             " 2001-09-09 01:46:46",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,

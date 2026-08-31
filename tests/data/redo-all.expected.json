@@ -2,97 +2,6 @@
   "actions": [
     {
       "args": [
-        "msg_a0236fd1c001TlwqL8fwvq529i"
-      ],
-      "display_line": 67,
-      "key": "R",
-      "range": {
-        "from": 63,
-        "to": 67
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_a0236fd1c001TlwqL8fwvq529i"
-      ],
-      "display_line": 67,
-      "key": "C",
-      "range": {
-        "from": 63,
-        "to": 67
-      },
-      "text": "[C]opy",
-      "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_a0236fd1c001TlwqL8fwvq529i"
-      ],
-      "display_line": 67,
-      "key": "F",
-      "range": {
-        "from": 63,
-        "to": 67
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
-    },
-    {
-      "args": [
-        "msg_a0234e308001SKl5bQUibp5gtI"
-      ],
-      "display_line": 33,
-      "key": "R",
-      "range": {
-        "from": 29,
-        "to": 33
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_a0234e308001SKl5bQUibp5gtI"
-      ],
-      "display_line": 33,
-      "key": "C",
-      "range": {
-        "from": 29,
-        "to": 33
-      },
-      "text": "[C]opy",
-      "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_a0234e308001SKl5bQUibp5gtI"
-      ],
-      "display_line": 33,
-      "key": "F",
-      "range": {
-        "from": 29,
-        "to": 33
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
-    },
-    {
-      "args": [
-        "msg_a0234c0b7001y2o9S1jMaNVZar"
-      ],
-      "display_line": 6,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 6
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
         "msg_a0234c0b7001y2o9S1jMaNVZar"
       ],
       "display_line": 6,
@@ -106,133 +15,29 @@
     },
     {
       "args": [
-        "msg_a0234c0b7001y2o9S1jMaNVZar"
+        "msg_a0236fd1c001TlwqL8fwvq529i"
       ],
-      "display_line": 6,
-      "key": "F",
+      "display_line": 63,
+      "key": "C",
       "range": {
-        "from": 0,
-        "to": 6
+        "from": 59,
+        "to": 63
       },
-      "text": "[F]ork",
-      "type": "fork_session"
+      "text": "[C]opy",
+      "type": "copy_message"
     },
     {
       "args": [
-        "1b6ba655c6c0d899965adff278ac6320d5fc3b12"
+        "msg_a0234e308001SKl5bQUibp5gtI"
       ],
-      "display_line": 22,
-      "key": "R",
+      "display_line": 31,
+      "key": "C",
       "range": {
-        "from": 22,
-        "to": 22
+        "from": 27,
+        "to": 31
       },
-      "text": "[R]evert file",
-      "type": "diff_revert_selected_file"
-    },
-    {
-      "args": [
-        "1b6ba655c6c0d899965adff278ac6320d5fc3b12"
-      ],
-      "display_line": 22,
-      "key": "A",
-      "range": {
-        "from": 22,
-        "to": 22
-      },
-      "text": "Revert [A]ll",
-      "type": "diff_revert_all"
-    },
-    {
-      "args": [
-        "1b6ba655c6c0d899965adff278ac6320d5fc3b12"
-      ],
-      "display_line": 22,
-      "key": "D",
-      "range": {
-        "from": 22,
-        "to": 22
-      },
-      "text": "[D]iff",
-      "type": "diff_open"
-    },
-    {
-      "args": [
-        "57d83f5596cb1f142fbc681d3d93b7184f7f73cd"
-      ],
-      "display_line": 56,
-      "key": "R",
-      "range": {
-        "from": 56,
-        "to": 56
-      },
-      "text": "[R]evert file",
-      "type": "diff_revert_selected_file"
-    },
-    {
-      "args": [
-        "57d83f5596cb1f142fbc681d3d93b7184f7f73cd"
-      ],
-      "display_line": 56,
-      "key": "A",
-      "range": {
-        "from": 56,
-        "to": 56
-      },
-      "text": "Revert [A]ll",
-      "type": "diff_revert_all"
-    },
-    {
-      "args": [
-        "57d83f5596cb1f142fbc681d3d93b7184f7f73cd"
-      ],
-      "display_line": 56,
-      "key": "D",
-      "range": {
-        "from": 56,
-        "to": 56
-      },
-      "text": "[D]iff",
-      "type": "diff_open"
-    },
-    {
-      "args": [
-        "d988cc85565b99017d40ad8baea20225165be9d5"
-      ],
-      "display_line": 90,
-      "key": "R",
-      "range": {
-        "from": 90,
-        "to": 90
-      },
-      "text": "[R]evert file",
-      "type": "diff_revert_selected_file"
-    },
-    {
-      "args": [
-        "d988cc85565b99017d40ad8baea20225165be9d5"
-      ],
-      "display_line": 90,
-      "key": "A",
-      "range": {
-        "from": 90,
-        "to": 90
-      },
-      "text": "Revert [A]ll",
-      "type": "diff_revert_all"
-    },
-    {
-      "args": [
-        "d988cc85565b99017d40ad8baea20225165be9d5"
-      ],
-      "display_line": 90,
-      "key": "D",
-      "range": {
-        "from": 90,
-        "to": 90
-      },
-      "text": "[D]iff",
-      "type": "diff_open"
+      "text": "[C]opy",
+      "type": "copy_message"
     }
   ],
   "extmarks": [
@@ -247,25 +52,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234c0b7001y2o9S1jMaNVZar]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -285,7 +90,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:02",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -304,7 +109,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -324,7 +129,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -344,7 +149,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -364,7 +169,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -384,25 +189,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234c7960011LTxTvD94hfWCi]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -422,7 +227,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:04",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -441,7 +246,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -461,7 +266,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -481,7 +286,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -499,22 +304,22 @@
         "end_right_gravity": false,
         "end_row": 16,
         "hl_eol": true,
-        "hl_group": "OpencodeDiffDelete",
+        "hl_group": "OmpDiffDelete",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "1",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ],
           [
             "-",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ],
           [
             " ",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -533,7 +338,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -551,22 +356,22 @@
         "end_right_gravity": false,
         "end_row": 17,
         "hl_eol": true,
-        "hl_group": "OpencodeDiffAdd",
+        "hl_group": "OmpDiffAdd",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "1",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ],
           [
             "+",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ],
           [
             " ",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -585,7 +390,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -608,15 +413,15 @@
         "virt_text": [
           [
             "2",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -635,7 +440,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -658,15 +463,15 @@
         "virt_text": [
           [
             "3",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -685,7 +490,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -705,7 +510,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -725,7 +530,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -736,7 +541,7 @@
     ],
     [
       22,
-      25,
+      23,
       0,
       {
         "ns_id": 3,
@@ -745,25 +550,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234d8fb001SXyngLjuKSuxOY]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -774,7 +579,7 @@
     ],
     [
       23,
-      25,
+      23,
       0,
       {
         "ns_id": 3,
@@ -783,7 +588,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:09",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -793,7 +598,7 @@
     ],
     [
       24,
-      30,
+      28,
       0,
       {
         "ns_id": 3,
@@ -802,25 +607,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234e308001SKl5bQUibp5gtI]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -831,7 +636,7 @@
     ],
     [
       25,
-      30,
+      28,
       0,
       {
         "ns_id": 3,
@@ -840,7 +645,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:11",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -850,7 +655,7 @@
     ],
     [
       26,
-      31,
+      29,
       0,
       {
         "ns_id": 3,
@@ -859,7 +664,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -870,7 +675,7 @@
     ],
     [
       27,
-      32,
+      30,
       0,
       {
         "ns_id": 3,
@@ -879,7 +684,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -890,7 +695,7 @@
     ],
     [
       28,
-      35,
+      33,
       0,
       {
         "ns_id": 3,
@@ -899,25 +704,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234e31f001m4EsQdPmY3PTtS]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -928,7 +733,7 @@
     ],
     [
       29,
-      35,
+      33,
       0,
       {
         "ns_id": 3,
@@ -937,7 +742,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:11",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -947,7 +752,7 @@
     ],
     [
       30,
-      42,
+      40,
       0,
       {
         "ns_id": 3,
@@ -956,25 +761,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234f482001PQbMjWc6W8s0eF]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -985,7 +790,7 @@
     ],
     [
       31,
-      42,
+      40,
       0,
       {
         "ns_id": 3,
@@ -994,7 +799,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:16",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1004,7 +809,7 @@
     ],
     [
       32,
-      46,
+      44,
       0,
       {
         "ns_id": 3,
@@ -1013,7 +818,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1024,7 +829,7 @@
     ],
     [
       33,
-      47,
+      45,
       0,
       {
         "ns_id": 3,
@@ -1033,7 +838,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1044,7 +849,7 @@
     ],
     [
       34,
-      48,
+      46,
       0,
       {
         "ns_id": 3,
@@ -1053,7 +858,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1064,29 +869,29 @@
     ],
     [
       35,
-      49,
+      47,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 50,
+        "end_row": 48,
         "hl_eol": true,
-        "hl_group": "OpencodeDiffDelete",
+        "hl_group": "OmpDiffDelete",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "1",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ],
           [
             "-",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ],
           [
             " ",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1096,7 +901,7 @@
     ],
     [
       36,
-      49,
+      47,
       0,
       {
         "ns_id": 3,
@@ -1105,7 +910,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1116,29 +921,29 @@
     ],
     [
       37,
-      50,
+      48,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 51,
+        "end_row": 49,
         "hl_eol": true,
-        "hl_group": "OpencodeDiffAdd",
+        "hl_group": "OmpDiffAdd",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "1",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ],
           [
             "+",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ],
           [
             " ",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1148,7 +953,7 @@
     ],
     [
       38,
-      50,
+      48,
       0,
       {
         "ns_id": 3,
@@ -1157,7 +962,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1168,27 +973,27 @@
     ],
     [
       39,
-      51,
+      49,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 52,
+        "end_row": 50,
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "2",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1198,7 +1003,7 @@
     ],
     [
       40,
-      51,
+      49,
       0,
       {
         "ns_id": 3,
@@ -1207,7 +1012,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1218,27 +1023,27 @@
     ],
     [
       41,
-      52,
+      50,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 53,
+        "end_row": 51,
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "3",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1248,7 +1053,7 @@
     ],
     [
       42,
-      52,
+      50,
       0,
       {
         "ns_id": 3,
@@ -1257,7 +1062,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1268,7 +1073,7 @@
     ],
     [
       43,
-      53,
+      51,
       0,
       {
         "ns_id": 3,
@@ -1277,7 +1082,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1288,7 +1093,7 @@
     ],
     [
       44,
-      54,
+      52,
       0,
       {
         "ns_id": 3,
@@ -1297,7 +1102,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1308,7 +1113,7 @@
     ],
     [
       45,
-      59,
+      55,
       0,
       {
         "ns_id": 3,
@@ -1317,25 +1122,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0234f9c6001JCKYaca1HHwwx6]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1346,7 +1151,7 @@
     ],
     [
       46,
-      59,
+      55,
       0,
       {
         "ns_id": 3,
@@ -1355,7 +1160,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:20:17",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1365,7 +1170,7 @@
     ],
     [
       47,
-      64,
+      60,
       0,
       {
         "ns_id": 3,
@@ -1374,25 +1179,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0236fd1c001TlwqL8fwvq529i]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1403,7 +1208,7 @@
     ],
     [
       48,
-      64,
+      60,
       0,
       {
         "ns_id": 3,
@@ -1412,7 +1217,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:22:29",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1422,7 +1227,7 @@
     ],
     [
       49,
-      65,
+      61,
       0,
       {
         "ns_id": 3,
@@ -1431,7 +1236,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -1442,7 +1247,7 @@
     ],
     [
       50,
-      66,
+      62,
       0,
       {
         "ns_id": 3,
@@ -1451,7 +1256,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -1462,7 +1267,7 @@
     ],
     [
       51,
-      69,
+      65,
       0,
       {
         "ns_id": 3,
@@ -1471,25 +1276,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a0236fd57001pTnTjSBdFlleCb]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1500,7 +1305,7 @@
     ],
     [
       52,
-      69,
+      65,
       0,
       {
         "ns_id": 3,
@@ -1509,7 +1314,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:22:29",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1519,7 +1324,7 @@
     ],
     [
       53,
-      76,
+      72,
       0,
       {
         "ns_id": 3,
@@ -1528,25 +1333,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a02371241001PBQAsr8Oc9hqNI]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1557,7 +1362,7 @@
     ],
     [
       54,
-      76,
+      72,
       0,
       {
         "ns_id": 3,
@@ -1566,7 +1371,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:22:34",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1576,7 +1381,7 @@
     ],
     [
       55,
-      80,
+      76,
       0,
       {
         "ns_id": 3,
@@ -1585,7 +1390,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1596,7 +1401,7 @@
     ],
     [
       56,
-      81,
+      77,
       0,
       {
         "ns_id": 3,
@@ -1605,7 +1410,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1616,7 +1421,7 @@
     ],
     [
       57,
-      82,
+      78,
       0,
       {
         "ns_id": 3,
@@ -1625,7 +1430,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1636,29 +1441,29 @@
     ],
     [
       58,
-      83,
+      79,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 84,
+        "end_row": 80,
         "hl_eol": true,
-        "hl_group": "OpencodeDiffDelete",
+        "hl_group": "OmpDiffDelete",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "1",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ],
           [
             "-",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ],
           [
             " ",
-            "OpencodeDiffDeleteGutter"
+            "OmpDiffDeleteGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1668,7 +1473,7 @@
     ],
     [
       59,
-      83,
+      79,
       0,
       {
         "ns_id": 3,
@@ -1677,7 +1482,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1688,29 +1493,29 @@
     ],
     [
       60,
-      84,
+      80,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 85,
+        "end_row": 81,
         "hl_eol": true,
-        "hl_group": "OpencodeDiffAdd",
+        "hl_group": "OmpDiffAdd",
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "1",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ],
           [
             "+",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ],
           [
             " ",
-            "OpencodeDiffAddGutter"
+            "OmpDiffAddGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1720,7 +1525,7 @@
     ],
     [
       61,
-      84,
+      80,
       0,
       {
         "ns_id": 3,
@@ -1729,7 +1534,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1740,27 +1545,27 @@
     ],
     [
       62,
-      85,
+      81,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 86,
+        "end_row": 82,
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "2",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1770,7 +1575,7 @@
     ],
     [
       63,
-      85,
+      81,
       0,
       {
         "ns_id": 3,
@@ -1779,7 +1584,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1790,27 +1595,27 @@
     ],
     [
       64,
-      86,
+      82,
       0,
       {
         "end_col": 0,
         "end_right_gravity": false,
-        "end_row": 87,
+        "end_row": 83,
         "ns_id": 3,
         "priority": 5000,
         "right_gravity": true,
         "virt_text": [
           [
             "3",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ],
           [
             " ",
-            "OpencodeDiffGutter"
+            "OmpDiffGutter"
           ]
         ],
         "virt_text_hide": false,
@@ -1820,7 +1625,7 @@
     ],
     [
       65,
-      86,
+      82,
       0,
       {
         "ns_id": 3,
@@ -1829,7 +1634,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1840,7 +1645,7 @@
     ],
     [
       66,
-      87,
+      83,
       0,
       {
         "ns_id": 3,
@@ -1849,7 +1654,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1860,7 +1665,7 @@
     ],
     [
       67,
-      88,
+      84,
       0,
       {
         "ns_id": 3,
@@ -1869,7 +1674,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeToolBorder"
+            "OmpToolBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -1880,7 +1685,7 @@
     ],
     [
       68,
-      93,
+      87,
       0,
       {
         "ns_id": 3,
@@ -1889,25 +1694,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a023723d0001r87MaJThFssUw1]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1918,7 +1723,7 @@
     ],
     [
       69,
-      93,
+      87,
       0,
       {
         "ns_id": 3,
@@ -1927,7 +1732,7 @@
         "virt_text": [
           [
             " 2025-10-20 15:22:39",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -1949,7 +1754,7 @@
     "",
     "I'll append a single word (\"again\") to the first line of `test.txt`. Applying a precise edit to the existing line now.",
     "",
-    "**  edit** `/home/francis/Projects/_nvim/opencode.nvim/test.txt`",
+    "**  edit** `/home/francis/Projects/_nvim/omp.nvim/test.txt`",
     "",
     "`````txt",
     "   tangram quiver saffron nebula cobalt murmur plinth zephyr ember lattice cadenza another yet extra more",
@@ -1958,8 +1763,6 @@
     "   ",
     "",
     "`````",
-    "",
-    "**󰻛  Created Snapshot** `1b6ba655`",
     "",
     "----",
     "",
@@ -1976,14 +1779,14 @@
     "",
     "I'll read `test.txt` to get the current first-line content, then append one word (\"again2\") to that line. Proceeding to read the file.",
     "",
-    "**  read** `/home/francis/Projects/_nvim/opencode.nvim/test.txt`",
+    "**  read** `/home/francis/Projects/_nvim/omp.nvim/test.txt`",
     "",
     "----",
     "",
     "",
     "Now I'll append the word \"again2\" to the first line. I'll apply an exact in-place edit to update that line.",
     "",
-    "**  edit** `/home/francis/Projects/_nvim/opencode.nvim/test.txt`",
+    "**  edit** `/home/francis/Projects/_nvim/omp.nvim/test.txt`",
     "",
     "`````txt",
     "   tangram quiver saffron nebula cobalt murmur plinth zephyr ember lattice cadenza another yet extra more again",
@@ -1992,8 +1795,6 @@
     "   ",
     "",
     "`````",
-    "",
-    "**󰻛  Created Snapshot** `57d83f55`",
     "",
     "----",
     "",
@@ -2010,14 +1811,14 @@
     "",
     "I'll read `test.txt` to get the current first-line content, then append the word `again3`. Proceeding to read the file.",
     "",
-    "**  read** `/home/francis/Projects/_nvim/opencode.nvim/test.txt`",
+    "**  read** `/home/francis/Projects/_nvim/omp.nvim/test.txt`",
     "",
     "----",
     "",
     "",
     "I'll append the word \"again3\" to the first line of `test.txt` with an exact in-place edit. Applying the change now.",
     "",
-    "**  edit** `/home/francis/Projects/_nvim/opencode.nvim/test.txt`",
+    "**  edit** `/home/francis/Projects/_nvim/omp.nvim/test.txt`",
     "",
     "`````txt",
     "   tangram quiver saffron nebula cobalt murmur plinth zephyr ember lattice cadenza another yet extra more again again2",
@@ -2026,8 +1827,6 @@
     "   ",
     "",
     "`````",
-    "",
-    "**󰻛  Created Snapshot** `d988cc85`",
     "",
     "----",
     "",
@@ -2039,11 +1838,11 @@
   "timestamp": 1774894778,
   "window": {
     "cursor": [
-      97,
+      91,
       0
     ],
-    "effective_bottom": 97,
-    "line_count": 98,
-    "visible_bottom": 97
+    "effective_bottom": 91,
+    "line_count": 92,
+    "visible_bottom": 91
   }
 }

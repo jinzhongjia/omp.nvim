@@ -1,17 +1,17 @@
-local api = require('opencode.api')
-local commands = require('opencode.commands')
-local command_parse = require('opencode.commands.parse')
-local slash = require('opencode.commands.slash')
-local session_runtime = require('opencode.services.session_runtime')
-local messaging = require('opencode.services.messaging')
-local agent_model = require('opencode.services.agent_model')
-local context = require('opencode.context')
-local input_window = require('opencode.ui.input_window')
-local ui = require('opencode.ui.ui')
-local state = require('opencode.state')
+local api = require('omp.api')
+local commands = require('omp.commands')
+local command_parse = require('omp.commands.parse')
+local slash = require('omp.commands.slash')
+local session_runtime = require('omp.services.session_runtime')
+local messaging = require('omp.services.messaging')
+local agent_model = require('omp.services.agent_model')
+local context = require('omp.context')
+local input_window = require('omp.ui.input_window')
+local ui = require('omp.ui.ui')
+local state = require('omp.state')
 local stub = require('luassert.stub')
 local assert = require('luassert')
-local Promise = require('opencode.promise')
+local Promise = require('omp.promise')
 
 ---@param id string
 ---@return Session
@@ -26,9 +26,9 @@ local function mk_session(id)
   }
 end
 
----@return OpencodeApiClient
+---@return OmpApiClient
 local function mk_api_client_for_test()
-  ---@type OpencodeApiClient
+  ---@type OmpApiClient
   local client = {
     base_url = 'http://127.0.0.1:4000',
     create_message = function(_, _, _)
@@ -67,7 +67,7 @@ end
 ---@param user_commands table<string, any>|nil
 ---@param fn fun()
 local function with_user_commands(user_commands, fn)
-  local config_file = require('opencode.config_file')
+  local config_file = require('omp.config_file')
   local original_get_user_commands = config_file.get_user_commands
 
   config_file.get_user_commands = function()
@@ -83,16 +83,16 @@ end
 
 ---@param config table
 ---@param fn fun()
-local function with_opencode_config(config, fn)
-  local config_file = require('opencode.config_file')
-  local original_get_opencode_config = config_file.get_opencode_config
+local function with_omp_config(config, fn)
+  local config_file = require('omp.config_file')
+  local original_get_omp_config = config_file.get_omp_config
 
-  config_file.get_opencode_config = function()
+  config_file.get_omp_config = function()
     return resolved(config)
   end
 
   local ok, err = pcall(fn)
-  config_file.get_opencode_config = original_get_opencode_config
+  config_file.get_omp_config = original_get_omp_config
   if not ok then
     error(err)
   end
@@ -142,7 +142,7 @@ local function find_slash_command(commands_list, slash_name)
   return nil
 end
 
-describe('opencode.api', function()
+describe('omp.api', function()
   local created_commands = {}
 
   before_each(function()
@@ -225,17 +225,17 @@ describe('opencode.api', function()
   end)
 
   describe('setup', function()
-    it('registers the main Opencode command', function()
+    it('registers the main Omp command', function()
       commands.setup()
 
       assert.equal(1, #created_commands)
-      assert.equal('Opencode', created_commands[1].name)
-      assert.equal('Opencode.nvim main command with nested subcommands', created_commands[1].opts.desc)
+      assert.equal('Omp', created_commands[1].name)
+      assert.equal('Omp.nvim main command with nested subcommands', created_commands[1].opts.desc)
     end)
   end)
 
   describe('public boundary', function()
-    it('does not expose command layer APIs via opencode.api', function()
+    it('does not expose command layer APIs via omp.api', function()
       assert.is_nil(api.setup)
       assert.is_nil(api.get_slash_commands)
       assert.is_nil(api.commands)
@@ -244,7 +244,7 @@ describe('opencode.api', function()
 
   describe('actions consolidation', function()
     it('keeps display/permission/history/session APIs callable from api', function()
-      assert.is_nil(package.loaded['opencode.actions'])
+      assert.is_nil(package.loaded['omp.actions'])
 
       assert.is_function(api.close)
       assert.is_function(api.hide)
@@ -358,11 +358,11 @@ describe('opencode.api', function()
 
           local after_run_stub = stub(messaging, 'after_run')
           local send_message_stub = stub(messaging, 'send_message').invokes(function(prompt)
-            require('opencode.services.messaging').after_run(prompt)
+            require('omp.services.messaging').after_run(prompt)
             return true
           end)
           local handle_submit_stub = stub(input_window, 'handle_submit').invokes(function()
-            require('opencode.services.messaging').send_message('hello')
+            require('omp.services.messaging').send_message('hello')
             return true
           end)
           local is_hidden_stub = stub(input_window, 'is_hidden').returns(true)
@@ -436,7 +436,7 @@ describe('opencode.api', function()
 
         assert
           .stub(notify_stub)
-          .was_called_with('No user commands found. Please check your opencode config file.', vim.log.levels.WARN)
+          .was_called_with('No user commands found. Please check your omp config file.', vim.log.levels.WARN)
 
         notify_stub:revert()
       end)
@@ -449,7 +449,7 @@ describe('opencode.api', function()
         ['build'] = { description = 'Build the project' },
         ['deploy'] = { description = 'Deploy to production' },
       }, function()
-        local completions = commands.complete_command('b', 'Opencode command b', 18)
+        local completions = commands.complete_command('b', 'Omp command b', 18)
         assert.same({ 'build' }, completions)
       end)
     end)
@@ -460,14 +460,14 @@ describe('opencode.api', function()
         ['test'] = { description = 'Run tests' },
         ['deploy'] = { description = 'Deploy to production' },
       }, function()
-        local completions = commands.complete_command('', 'Opencode command ', 17)
+        local completions = commands.complete_command('', 'Omp command ', 17)
         assert.same({ 'build', 'deploy', 'test' }, completions)
       end)
     end)
 
     it('returns empty array when no user commands exist', function()
       with_user_commands(nil, function()
-        local completions = commands.complete_command('', 'Opencode command ', 17)
+        local completions = commands.complete_command('', 'Omp command ', 17)
         assert.same({}, completions)
       end)
     end)
@@ -482,7 +482,7 @@ describe('opencode.api', function()
       })
 
       assert.has_no.errors(function()
-        local completions = commands.complete_command('', 'Opencode broken ', 16)
+        local completions = commands.complete_command('', 'Omp broken ', 16)
         assert.same({}, completions)
       end)
 
@@ -496,8 +496,8 @@ describe('opencode.api', function()
         stub(api, 'open_input').invokes(function()
           return resolved('done')
         end)
-        local config_file = require('opencode.config_file')
-        stub(config_file, 'get_opencode_agents').returns(resolved({ 'plan', 'build' }))
+        local config_file = require('omp.config_file')
+        stub(config_file, 'get_omp_agents').returns(resolved({ 'plan', 'build' }))
       end)
 
       it('invokes run with correct model and agent', function()
@@ -582,7 +582,7 @@ describe('opencode.api', function()
         state.model.clear_mode()
         state.renderer.set_messages(nil)
 
-        with_opencode_config({ model = 'testmodel' }, function()
+        with_omp_config({ model = 'testmodel' }, function()
           local model = api.current_model():wait()
           assert.equal('testmodel', model)
         end)

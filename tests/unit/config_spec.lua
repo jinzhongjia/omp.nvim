@@ -1,9 +1,9 @@
 -- tests/unit/config_spec.lua
 -- Tests for the config module
 
-local config = require('opencode.config')
+local config = require('omp.config')
 
-describe('opencode.config', function()
+describe('omp.config', function()
   -- Save original config values
   local original_config
 

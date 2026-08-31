@@ -5,19 +5,6 @@
         "msg_user_metadata_update"
       ],
       "display_line": 4,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_user_metadata_update"
-      ],
-      "display_line": 4,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,19 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_user_metadata_update"
-      ],
-      "display_line": 4,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 4
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
     }
   ],
   "extmarks": [
@@ -52,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_user_metadata_update]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -90,7 +64,7 @@
         "virt_text": [
           [
             " 2023-11-14 22:13:20",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -109,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,

@@ -1,7 +1,7 @@
 local assert = require('luassert')
-local Promise = require('opencode.promise')
+local Promise = require('omp.promise')
 
-describe('opencode LSP completion', function()
+describe('omp LSP completion', function()
   local mock_config
   local mock_completion
   local mock_promise
@@ -29,14 +29,14 @@ describe('opencode LSP completion', function()
       },
     }
 
-    package.loaded['opencode.config'] = mock_config
+    package.loaded['omp.config'] = mock_config
     package.loaded['blink.cmp'] = nil -- ensure blink.cmp is not loaded by default
   end)
 
   after_each(function()
-    package.loaded['opencode.config'] = nil
-    package.loaded['opencode.ui.completion'] = nil
-    package.loaded['opencode.lsp.opencode_ls'] = nil
+    package.loaded['omp.config'] = nil
+    package.loaded['omp.ui.completion'] = nil
+    package.loaded['omp.lsp.omp_ls'] = nil
     package.loaded['blink.cmp'] = nil
   end)
 
@@ -44,16 +44,16 @@ describe('opencode LSP completion', function()
     local completion
 
     before_each(function()
-      package.loaded['opencode.ui.completion'] = nil
-      package.loaded['opencode.ui.completion.files'] = nil
-      package.loaded['opencode.ui.completion.subagents'] = nil
-      package.loaded['opencode.ui.completion.commands'] = nil
-      package.loaded['opencode.ui.completion.context'] = nil
-      completion = require('opencode.ui.completion')
+      package.loaded['omp.ui.completion'] = nil
+      package.loaded['omp.ui.completion.files'] = nil
+      package.loaded['omp.ui.completion.subagents'] = nil
+      package.loaded['omp.ui.completion.commands'] = nil
+      package.loaded['omp.ui.completion.context'] = nil
+      completion = require('omp.ui.completion')
     end)
 
     after_each(function()
-      package.loaded['opencode.ui.completion'] = nil
+      package.loaded['omp.ui.completion'] = nil
     end)
 
     describe('register_source', function()
@@ -232,16 +232,16 @@ describe('opencode LSP completion', function()
     end)
   end)
 
-  describe('opencode_ls module', function()
+  describe('omp_ls module', function()
     local ls
 
     before_each(function()
-      package.loaded['opencode.lsp.opencode_ls'] = nil
-      ls = require('opencode.lsp.opencode_ls')
+      package.loaded['omp.lsp.omp_ls'] = nil
+      ls = require('omp.lsp.omp_ls')
     end)
 
     after_each(function()
-      package.loaded['opencode.lsp.opencode_ls'] = nil
+      package.loaded['omp.lsp.omp_ls'] = nil
     end)
 
     describe('create_config', function()
@@ -249,7 +249,7 @@ describe('opencode LSP completion', function()
         local config = ls.create_config()
 
         assert.is_not_nil(config)
-        assert.are.equal('opencode_ls', config.name)
+        assert.are.equal('omp_ls', config.name)
         assert.is_function(config.cmd)
       end)
 
@@ -272,8 +272,8 @@ describe('opencode LSP completion', function()
 
     describe('initialize handler', function()
       it('returns capabilities with trigger characters from completion sources', function()
-        package.loaded['opencode.ui.completion'] = nil
-        local completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        local completion = require('omp.ui.completion')
         completion._sources = {}
         completion.register_source({
           name = 'source1',
@@ -292,8 +292,8 @@ describe('opencode LSP completion', function()
           end,
         })
 
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
         local config_obj = ls.create_config()
         local server = config_obj.cmd({}, {})
@@ -309,7 +309,7 @@ describe('opencode LSP completion', function()
         local triggers = result.capabilities.completionProvider.triggerCharacters
         assert.is_true(vim.tbl_contains(triggers, '@'))
         assert.is_true(vim.tbl_contains(triggers, '/'))
-        assert.are.equal('opencode_ls', result.serverInfo.name)
+        assert.are.equal('omp_ls', result.serverInfo.name)
       end)
     end)
 
@@ -317,8 +317,8 @@ describe('opencode LSP completion', function()
       local completion
 
       before_each(function()
-        package.loaded['opencode.ui.completion'] = nil
-        completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        completion = require('omp.ui.completion')
         completion._sources = {}
 
         vim.api = vim.api or {}
@@ -335,8 +335,8 @@ describe('opencode LSP completion', function()
           return { 1, 5 }
         end
 
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
       end)
 
       it('returns completion items from registered sources', function()
@@ -508,7 +508,7 @@ describe('opencode LSP completion', function()
         assert.are.equal(1, #callback_result.items)
         local cmd = callback_result.items[1].command
         assert.is_not_nil(cmd)
-        assert.are.equal('opencode.completion_done', cmd.command)
+        assert.are.equal('omp.completion_done', cmd.command)
       end)
 
       it('calls callback with empty result on error', function()
@@ -524,7 +524,7 @@ describe('opencode LSP completion', function()
         })
 
         -- Mock log to suppress error output
-        package.loaded['opencode.log'] = { error = function() end }
+        package.loaded['omp.log'] = { error = function() end }
 
         local config_obj = ls.create_config()
         local server = config_obj.cmd({}, {})
@@ -543,7 +543,7 @@ describe('opencode LSP completion', function()
         end)
 
         assert.is_not_nil(callback_result)
-        package.loaded['opencode.log'] = nil
+        package.loaded['omp.log'] = nil
       end)
     end)
 
@@ -551,15 +551,15 @@ describe('opencode LSP completion', function()
       local completion
 
       before_each(function()
-        package.loaded['opencode.ui.completion'] = nil
-        completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        completion = require('omp.ui.completion')
         completion._sources = {}
 
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
       end)
 
-      it('calls on_completion_done when command is opencode.completion_done', function()
+      it('calls on_completion_done when command is omp.completion_done', function()
         local on_complete_called = false
         local received_item = nil
 
@@ -579,7 +579,7 @@ describe('opencode LSP completion', function()
         local original_item = { label = 'CmdItem', source_name = 'cmd_source', data = {} }
         local cb_err, cb_result
         server.request('workspace/executeCommand', {
-          command = 'opencode.completion_done',
+          command = 'omp.completion_done',
           arguments = { original_item },
         }, function(err, result)
           cb_err = err
@@ -610,7 +610,7 @@ describe('opencode LSP completion', function()
         local server = config_obj.cmd({}, {})
 
         server.request('workspace/executeCommand', {
-          command = 'opencode.completion_done',
+          command = 'omp.completion_done',
           arguments = { { label = 'Item', source_name = 'dedup_source', data = {} } },
         }, function() end)
 
@@ -625,7 +625,7 @@ describe('opencode LSP completion', function()
         local server = config_obj.cmd({}, {})
 
         server.request('workspace/executeCommand', {
-          command = 'opencode.completion_done',
+          command = 'omp.completion_done',
           arguments = { { label = 'X', source_name = 'any', data = {} } },
         }, function() end)
 
@@ -655,7 +655,7 @@ describe('opencode LSP completion', function()
 
         assert.has_no.errors(function()
           server.request('workspace/executeCommand', {
-            command = 'opencode.completion_done',
+            command = 'omp.completion_done',
             -- no arguments
           }, function() end)
         end)
@@ -666,12 +666,12 @@ describe('opencode LSP completion', function()
       local completion
 
       before_each(function()
-        package.loaded['opencode.ui.completion'] = nil
-        completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        completion = require('omp.ui.completion')
         completion._sources = {}
 
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
         ls.start(0)
       end)
@@ -692,7 +692,7 @@ describe('opencode LSP completion', function()
           nvim = {
             lsp = {
               completion_item = {
-                data = { _opencode_item = { source_name = 'test', label = 'test', data = {} } },
+                data = { _omp_item = { source_name = 'test', label = 'test', data = {} } },
               },
             },
           },
@@ -720,7 +720,7 @@ describe('opencode LSP completion', function()
           nvim = {
             lsp = {
               completion_item = {
-                data = { _opencode_item = original_item },
+                data = { _omp_item = original_item },
               },
             },
           },
@@ -748,7 +748,7 @@ describe('opencode LSP completion', function()
         fire_autocmd({
           lsp = {
             item = {
-              data = { _opencode_item = original_item },
+              data = { _omp_item = original_item },
             },
           },
         })
@@ -757,7 +757,7 @@ describe('opencode LSP completion', function()
         assert.are.same(original_item, received_item)
       end)
 
-      it('does not error when user_data has no _opencode_item', function()
+      it('does not error when user_data has no _omp_item', function()
         assert.has_no.errors(function()
           fire_autocmd({ nvim = { lsp = { completion_item = { data = {} } } } })
         end)
@@ -787,7 +787,7 @@ describe('opencode LSP completion', function()
           nvim = {
             lsp = {
               completion_item = {
-                data = { _opencode_item = original_item },
+                data = { _omp_item = original_item },
               },
             },
           },
@@ -800,7 +800,7 @@ describe('opencode LSP completion', function()
         local config_obj = ls.create_config()
         local server = config_obj.cmd({}, {})
         server.request('workspace/executeCommand', {
-          command = 'opencode.completion_done',
+          command = 'omp.completion_done',
           arguments = { original_item },
         }, function() end)
 
@@ -811,8 +811,8 @@ describe('opencode LSP completion', function()
 
     describe('unregistered handler', function()
       it('does not error when an unknown method is called', function()
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
         local config_obj = ls.create_config()
         local server = config_obj.cmd({}, {})
@@ -831,11 +831,11 @@ describe('opencode LSP completion', function()
             return false
           end,
         }
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
-        package.loaded['opencode.ui.completion'] = nil
-        local completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        local completion = require('omp.ui.completion')
         completion._sources = {}
         completion.register_source({
           name = 'blink_source',
@@ -897,11 +897,11 @@ describe('opencode LSP completion', function()
         -- Ensure no float engine is present
         package.loaded['blink.cmp'] = nil
         package.loaded['cmp'] = nil
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
-        package.loaded['opencode.ui.completion'] = nil
-        local completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        local completion = require('omp.ui.completion')
         completion._sources = {}
         completion.register_source({
           name = 'no_blink_source',
@@ -961,11 +961,11 @@ describe('opencode LSP completion', function()
 
       it('sets insertText from item.insertText or item.label', function()
         package.loaded['blink.cmp'] = nil
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
-        package.loaded['opencode.ui.completion'] = nil
-        local completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        local completion = require('omp.ui.completion')
         completion._sources = {}
         completion.register_source({
           name = 'insert_test_source',
@@ -1018,13 +1018,13 @@ describe('opencode LSP completion', function()
         assert.are.equal('compact', callback_result.items[1].insertText)
       end)
 
-      it('embeds the original item in data._opencode_item', function()
+      it('embeds the original item in data._omp_item', function()
         package.loaded['blink.cmp'] = nil
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
-        package.loaded['opencode.ui.completion'] = nil
-        local completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        local completion = require('omp.ui.completion')
         completion._sources = {}
 
         local original_item = {
@@ -1077,18 +1077,18 @@ describe('opencode LSP completion', function()
         assert.are.equal(1, #callback_result.items)
         local lsp_item = callback_result.items[1]
         assert.is_not_nil(lsp_item.data)
-        assert.is_not_nil(lsp_item.data._opencode_item)
-        assert.are.equal(original_item.label, lsp_item.data._opencode_item.label)
-        assert.are.equal('value', lsp_item.data._opencode_item.data.custom)
+        assert.is_not_nil(lsp_item.data._omp_item)
+        assert.are.equal(original_item.label, lsp_item.data._omp_item.label)
+        assert.are.equal('value', lsp_item.data._omp_item.data.custom)
       end)
 
       it('calculates correct textEdit range to replace typed word', function()
         package.loaded['blink.cmp'] = nil
-        package.loaded['opencode.lsp.opencode_ls'] = nil
-        ls = require('opencode.lsp.opencode_ls')
+        package.loaded['omp.lsp.omp_ls'] = nil
+        ls = require('omp.lsp.omp_ls')
 
-        package.loaded['opencode.ui.completion'] = nil
-        local completion = require('opencode.ui.completion')
+        package.loaded['omp.ui.completion'] = nil
+        local completion = require('omp.ui.completion')
         completion._sources = {}
 
         local item_for_range_test = {

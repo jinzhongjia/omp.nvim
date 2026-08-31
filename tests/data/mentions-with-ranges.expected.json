@@ -5,19 +5,6 @@
         "msg_9daca16bf0017x95VD45mw3k8Q"
       ],
       "display_line": 22,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 22
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_9daca16bf0017x95VD45mw3k8Q"
-      ],
-      "display_line": 22,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,19 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_9daca16bf0017x95VD45mw3k8Q"
-      ],
-      "display_line": 22,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 22
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
     }
   ],
   "extmarks": [
@@ -52,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_9daca16bf0017x95VD45mw3k8Q]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -90,7 +64,7 @@
         "virt_text": [
           [
             " 2025-10-12 23:38:21",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -109,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -147,7 +121,7 @@
         "end_right_gravity": false,
         "end_row": 3,
         "hl_eol": false,
-        "hl_group": "OpencodeMention",
+        "hl_group": "OmpMention",
         "ns_id": 3,
         "priority": 1000,
         "right_gravity": true
@@ -164,7 +138,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -184,7 +158,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -196,13 +170,13 @@
     [
       8,
       5,
-      23,
+      28,
       {
         "end_col": 48,
         "end_right_gravity": false,
         "end_row": 5,
         "hl_eol": false,
-        "hl_group": "OpencodeMention",
+        "hl_group": "OmpMention",
         "ns_id": 3,
         "priority": 1000,
         "right_gravity": true
@@ -219,7 +193,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -239,7 +213,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -259,7 +233,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -279,7 +253,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -299,7 +273,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -319,7 +293,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -339,7 +313,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -359,7 +333,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -379,7 +353,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -399,7 +373,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -419,7 +393,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -439,7 +413,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -459,7 +433,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -479,7 +453,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -499,7 +473,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -519,7 +493,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -533,7 +507,7 @@
     "----",
     "",
     "",
-    "when @lua/opencode/ui/streaming_renderer.lua renders a diff, only the first character, the + has the extmark. the rest of the line doesn't seem to have the highlight?",
+    "when @lua/omp/ui/streaming_renderer.lua renders a diff, only the first character, the + has the extmark. the rest of the line doesn't seem to have the highlight?",
     "",
     "here's an example from @tests/data/planning.json",
     "",
@@ -547,11 +521,11 @@
     "",
     "the - and the + are highlighted in the right color but none of the text is. any ideas?",
     "",
-    "[`lua/opencode/ui/streaming_renderer.lua`](lua/opencode/ui/streaming_renderer.lua)",
+    "[`lua/omp/ui/streaming_renderer.lua`](lua/omp/ui/streaming_renderer.lua)",
     "",
     "[`tests/data/planning.json`](tests/data/planning.json)",
     "",
-    "[`lua/opencode/ui/session_formatter.lua`](lua/opencode/ui/session_formatter.lua)",
+    "[`lua/omp/ui/session_formatter.lua`](lua/omp/ui/session_formatter.lua)",
     "",
     ""
   ],

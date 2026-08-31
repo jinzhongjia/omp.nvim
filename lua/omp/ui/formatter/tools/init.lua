@@ -1,0 +1,17 @@
+return {
+  bash = require('omp.ui.formatter.tools.bash'),
+  read = require('omp.ui.formatter.tools.file'),
+  edit = require('omp.ui.formatter.tools.file'),
+  write = require('omp.ui.formatter.tools.file'),
+  apply_patch = require('omp.ui.formatter.tools.apply_patch'),
+  todowrite = require('omp.ui.formatter.tools.todowrite'),
+  glob = require('omp.ui.formatter.tools.glob'),
+  grep = require('omp.ui.formatter.tools.grep'),
+  webfetch = require('omp.ui.formatter.tools.webfetch'),
+  list = require('omp.ui.formatter.tools.list'),
+  question = require('omp.ui.formatter.tools.question'),
+  skill = require('omp.ui.formatter.tools.skill'),
+  task = require('omp.ui.formatter.tools.task'),
+  mcp = require('omp.ui.formatter.tools.mcp'),
+  tool = require('omp.ui.formatter.tools.tool'),
+}

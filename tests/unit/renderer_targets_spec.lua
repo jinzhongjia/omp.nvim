@@ -1,9 +1,9 @@
-local ctx = require('opencode.ui.renderer.ctx')
-local renderer = require('opencode.ui.renderer')
-local flush = require('opencode.ui.renderer.flush')
+local ctx = require('omp.ui.renderer.ctx')
+local renderer = require('omp.ui.renderer')
+local flush = require('omp.ui.renderer.flush')
 local stub = require('luassert.stub')
 local helpers = require('tests.helpers')
-local state = require('opencode.state')
+local state = require('omp.state')
 
 describe('renderer target API', function()
   local schedule_stub
@@ -57,9 +57,9 @@ describe('renderer flush formatter context', function()
   before_each(function()
     helpers.replay_setup()
     ctx:reset()
-    formatter = require('opencode.ui.formatter')
-    reference_facts = require('opencode.ui.reference_facts')
-    symbol_snapshot = require('opencode.ui.symbol_snapshot')
+    formatter = require('omp.ui.formatter')
+    reference_facts = require('omp.ui.reference_facts')
+    symbol_snapshot = require('omp.ui.symbol_snapshot')
   end)
 
   after_each(function()
@@ -77,12 +77,12 @@ describe('renderer flush formatter context', function()
     end
     ctx:reset()
     if state.windows then
-      require('opencode.ui.ui').close_windows(state.windows)
+      require('omp.ui.ui').close_windows(state.windows)
     end
   end)
 
   it('creates one symbol cycle and shares it across formatted parts', function()
-    local Output = require('opencode.ui.output')
+    local Output = require('omp.ui.output')
     local cycle = { id = 'cycle_1' }
     local contexts = {}
 

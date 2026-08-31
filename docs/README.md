@@ -1,22 +1,7 @@
-# Opencode.nvim Documentation
+# omp.nvim 文档
 
-## Recipes
+## 可用配方
 
-Community-contributed configurations and workflows for opencode.nvim.
+- [三态窗口布局](./recipes/three-state-layout/README.md)：在代码、分栏和浮窗布局之间切换。
 
-### Available Recipes
-
-- [Bidirectional TUI/nvim Sync](./recipes/bidirectional-sync/README.md) - Share sessions between TUI and nvim plugin seamlessly
-- [Three-State Layout Toggle](./recipes/three-state-layout/README.md) - Instantly switch between code/split/dialog viewing modes
-- [Change-by-Change Review](./recipes/change-by-change-review/README.md) - Review Opencode edits using diffview+ and gitsigns
-
-### Contributing a Recipe
-
-Want to share your setup? Use the [Recipe Template](./recipes/TEMPLATE.md) to ensure consistency:
-
-- Start with the problem you're solving
-- Include a GIF demonstration
-- Provide step-by-step setup instructions
-- Cross-reference related recipes
-
-Recipes should be self-contained and solve a specific workflow need.
+`bidirectional-sync` 与 `change-by-change-review` 是 opencode HTTP/snapshot 后端时期的历史配方，不适用于 omp RPC 后端，当前不再列为受支持功能。

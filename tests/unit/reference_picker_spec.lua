@@ -1,6 +1,6 @@
 local assert = require('luassert')
 
-describe('opencode.ui.reference_picker', function()
+describe('omp.ui.reference_picker', function()
   local reference_picker
   local mock_config
   local mock_base_picker
@@ -57,7 +57,7 @@ describe('opencode.ui.reference_picker', function()
         picker = {},
       },
     }
-    package.loaded['opencode.config'] = mock_config
+    package.loaded['omp.config'] = mock_config
 
     mock_base_picker = {
       pick = function()
@@ -67,7 +67,7 @@ describe('opencode.ui.reference_picker', function()
         return { text = text }
       end,
     }
-    package.loaded['opencode.ui.base_picker'] = mock_base_picker
+    package.loaded['omp.ui.base_picker'] = mock_base_picker
 
     mock_icons = {
       get = function(name)
@@ -77,11 +77,11 @@ describe('opencode.ui.reference_picker', function()
         return ''
       end,
     }
-    package.loaded['opencode.ui.icons'] = mock_icons
+    package.loaded['omp.ui.icons'] = mock_icons
 
-    reference_picker = require('opencode.ui.reference_picker')
-    package.loaded['opencode.ui.reference_parser'] = nil
-    reference_facts = require('opencode.ui.reference_facts')
+    reference_picker = require('omp.ui.reference_picker')
+    package.loaded['omp.ui.reference_parser'] = nil
+    reference_facts = require('omp.ui.reference_facts')
     reference_facts.clear()
   end)
 
@@ -91,12 +91,12 @@ describe('opencode.ui.reference_picker', function()
     vim.cmd = original_cmd
     vim.api = original_api
 
-    package.loaded['opencode.ui.reference_picker'] = nil
-    package.loaded['opencode.config'] = nil
-    package.loaded['opencode.ui.base_picker'] = nil
-    package.loaded['opencode.ui.icons'] = nil
-    package.loaded['opencode.ui.reference_facts'] = nil
-    package.loaded['opencode.ui.reference_parser'] = nil
+    package.loaded['omp.ui.reference_picker'] = nil
+    package.loaded['omp.config'] = nil
+    package.loaded['omp.ui.base_picker'] = nil
+    package.loaded['omp.ui.icons'] = nil
+    package.loaded['omp.ui.reference_facts'] = nil
+    package.loaded['omp.ui.reference_parser'] = nil
   end)
 
   describe('navigate_to', function()

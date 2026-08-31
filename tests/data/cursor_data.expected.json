@@ -5,19 +5,6 @@
         "msg_a3637244a001FDRDfoBYVPEGpd"
       ],
       "display_line": 11,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 11
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_a3637244a001FDRDfoBYVPEGpd"
-      ],
-      "display_line": 11,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,19 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_a3637244a001FDRDfoBYVPEGpd"
-      ],
-      "display_line": 11,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 11
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
     }
   ],
   "extmarks": [
@@ -52,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a3637244a001FDRDfoBYVPEGpd]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -90,7 +64,7 @@
         "virt_text": [
           [
             " 2025-10-30 17:42:54",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -109,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -149,7 +123,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -169,7 +143,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -189,7 +163,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -209,7 +183,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -229,7 +203,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -249,7 +223,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -269,7 +243,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -289,7 +263,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -309,25 +283,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-5-mini",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_a36372b9a001M1lQEix4SK5QE5]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -347,7 +321,7 @@
         "virt_text": [
           [
             " 2025-10-30 17:42:56",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -362,7 +336,7 @@
     "",
     "what is this doing",
     "",
-    "[`lua/opencode/context.lua`](lua/opencode/context.lua)",
+    "[`lua/omp/context.lua`](lua/omp/context.lua)",
     "",
     "Line 59:",
     "`````lua",
@@ -374,7 +348,7 @@
     "",
     "**Explanation**",
     "",
-    "- The line `local is_enabled = vim.tbl_get(config, 'context', context_key, 'enabled')` (in `lua/opencode/context.lua:58`) uses `vim.tbl_get` to safely read a nested field from a table.",
+    "- The line `local is_enabled = vim.tbl_get(config, 'context', context_key, 'enabled')` (in `lua/omp/context.lua:58`) uses `vim.tbl_get` to safely read a nested field from a table.",
     "- Concretely it attempts to read `config.context[context_key].enabled` but without throwing an error if `config.context` or `config.context[context_key]` is nil. If any intermediate key is missing it returns `nil`.",
     "- In the surrounding function `M.is_context_enabled`, that value is the default config value for the given context key. The function then checks the state override:",
     "  - If `state.current_context_config[context_key].enabled` is not `nil`, that state value (true/false) is returned.",

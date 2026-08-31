@@ -1,105 +1,46 @@
--- tests/minimal/plugin_spec.lua
--- Integration tests for the full plugin (lightweight)
-
-local Promise = require('opencode.promise')
-
-describe('opencode.nvim plugin', function()
-  local original_schedule
-  local original_ensure_server
-  local original_api_client_new
+describe('omp.nvim plugin', function()
   local original_system
   local original_executable
 
   before_each(function()
-    original_schedule = vim.schedule
-    vim.schedule = function(fn)
-      fn()
-    end
-
-    -- Mock vim.system for opencode version check
     original_system = vim.system
-    vim.system = function(_cmd, _opts)
-      return {
-        wait = function()
-          return { stdout = 'opencode 0.6.3' }
-        end,
-      }
-    end
-
-    -- Mock vim.fn.executable for opencode check
     original_executable = vim.fn.executable
-    vim.fn.executable = function(_)
+    vim.fn.executable = function()
       return 1
     end
-
-    -- Stub ensure_server so no real process is spawned
-    local server_job = require('opencode.server_job')
-    original_ensure_server = server_job.ensure_server
-    server_job.ensure_server = function()
+    vim.system = function(_, _, callback)
+      local result = { code = 0, signal = 0, stdout = 'omp/18.0.11\n', stderr = '' }
+      if callback then
+        vim.schedule(function()
+          callback(result)
+        end)
+      end
       return {
-        url = 'http://localhost:9000',
-        is_running = function()
-          return true
-        end,
-      }
-    end
-
-    -- Stub api_client constructor to return mock with needed methods
-    local api_client_mod = require('opencode.api_client')
-    original_api_client_new = api_client_mod.new
-    api_client_mod.new = function(url)
-      return {
-        url = url,
-        get_config = function()
-          return Promise.new():resolve({ agent = {} })
-        end,
-        get_current_project = function()
-          return Promise.new():resolve({ id = 'p1', name = 'TestProject', path = '/tmp' })
-        end,
-        create_session = function()
-          return Promise.new():resolve({ id = 's1' })
-        end,
-        create_message = function(_, _id, _params)
-          return Promise.new():resolve({ id = 'm1' })
-        end,
-        abort_session = function()
-          return Promise.new():resolve(true)
+        wait = function()
+          return result
         end,
       }
     end
   end)
 
   after_each(function()
-    vim.schedule = original_schedule
     vim.system = original_system
     vim.fn.executable = original_executable
-    if original_ensure_server then
-      require('opencode.server_job').ensure_server = original_ensure_server
-    end
-    if original_api_client_new then
-      require('opencode.api_client').new = original_api_client_new
-    end
   end)
 
   it('loads the plugin without errors', function()
-    local opencode = require('opencode')
-    assert.truthy(opencode, 'Plugin should be loaded')
-    assert.is_function(opencode.setup, 'setup function should be available')
+    local omp = require('omp')
+    assert.truthy(omp)
+    assert.is_function(omp.setup)
   end)
 
-  it('can be set up with custom config', function()
-    local opencode = require('opencode')
-
-    opencode.setup({
+  it('registers the Omp command with custom config', function()
+    require('omp').setup({
       default_global_keymaps = false,
-      keymap = {
-        editor = {
-          ['<leader>test'] = { 'toggle' },
-        },
-      },
+      keymap = { editor = { ['<leader>test'] = { 'toggle' } } },
     })
 
-    local config = require('opencode.config')
-    assert.same({ 'toggle' }, config.keymap.editor['<leader>test'])
+    assert.same({ 'toggle' }, require('omp.config').keymap.editor['<leader>test'])
+    assert.equals(2, vim.fn.exists(':Omp'))
   end)
 end)

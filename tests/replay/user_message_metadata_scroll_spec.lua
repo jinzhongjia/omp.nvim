@@ -1,7 +1,7 @@
 local helpers = require('tests.helpers')
-local state = require('opencode.state')
-local ui = require('opencode.ui.ui')
-local output_window = require('opencode.ui.output_window')
+local state = require('omp.state')
+local ui = require('omp.ui.ui')
+local output_window = require('omp.ui.output_window')
 
 local fixture_path = 'tests/data/user-message-metadata-update.json'
 

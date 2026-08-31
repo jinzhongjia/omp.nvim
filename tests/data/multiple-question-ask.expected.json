@@ -5,19 +5,6 @@
         "msg_bfab6dbf3001ZOVHTFKR1CMUE5"
       ],
       "display_line": 6,
-      "key": "R",
-      "range": {
-        "from": 0,
-        "to": 6
-      },
-      "text": "[R]evert",
-      "type": "undo"
-    },
-    {
-      "args": [
-        "msg_bfab6dbf3001ZOVHTFKR1CMUE5"
-      ],
-      "display_line": 6,
       "key": "C",
       "range": {
         "from": 0,
@@ -25,19 +12,6 @@
       },
       "text": "[C]opy",
       "type": "copy_message"
-    },
-    {
-      "args": [
-        "msg_bfab6dbf3001ZOVHTFKR1CMUE5"
-      ],
-      "display_line": 6,
-      "key": "F",
-      "range": {
-        "from": 0,
-        "to": 6
-      },
-      "text": "[F]ork",
-      "type": "fork_session"
     }
   ],
   "extmarks": [
@@ -52,25 +26,25 @@
         "virt_text": [
           [
             "▌󰭻 ",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "USER",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_bfab6dbf3001ZOVHTFKR1CMUE5]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -90,7 +64,7 @@
         "virt_text": [
           [
             " 2026-01-26 14:30:46",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -109,7 +83,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -129,7 +103,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -149,7 +123,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -169,7 +143,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -189,7 +163,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeMessageRoleUser"
+            "OmpMessageRoleUser"
           ]
         ],
         "virt_text_hide": false,
@@ -209,25 +183,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "BUILD",
-            "OpencodeMessageRoleAssistant"
+            "OmpMessageRoleAssistant"
           ],
           [
             " "
           ],
           [
             "github-copilot/gpt-4.1",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [msg_bfab6dc80001FueCN7E2691J2R]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -247,7 +221,7 @@
         "virt_text": [
           [
             " 2026-01-26 14:30:46",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -266,25 +240,25 @@
         "virt_text": [
           [
             " ",
-            "OpencodeMessageRoleSystem"
+            "OmpMessageRoleSystem"
           ],
           [
             " "
           ],
           [
             "SYSTEM",
-            "OpencodeMessageRoleSystem"
+            "OmpMessageRoleSystem"
           ],
           [
             " "
           ],
           [
             "",
-            "OpencodeHint"
+            "OmpHint"
           ],
           [
             " [question-display-message]",
-            "OpencodeHint"
+            "OmpHint"
           ]
         ],
         "virt_text_hide": false,
@@ -302,7 +276,7 @@
         "end_right_gravity": false,
         "end_row": 15,
         "hl_eol": false,
-        "hl_group": "OpencodeQuestionTabActive",
+        "hl_group": "OmpQuestionTabActive",
         "ns_id": 3,
         "priority": 4096,
         "right_gravity": true
@@ -317,7 +291,7 @@
         "end_right_gravity": false,
         "end_row": 15,
         "hl_eol": false,
-        "hl_group": "OpencodeQuestionTabPending",
+        "hl_group": "OmpQuestionTabPending",
         "ns_id": 3,
         "priority": 4096,
         "right_gravity": true
@@ -328,7 +302,7 @@
       17,
       0,
       {
-        "line_hl_group": "OpencodeQuestionTitle",
+        "line_hl_group": "OmpQuestionTitle",
         "ns_id": 3,
         "priority": 4096,
         "right_gravity": true
@@ -345,7 +319,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -365,7 +339,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -385,7 +359,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -405,7 +379,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -419,7 +393,7 @@
       21,
       0,
       {
-        "line_hl_group": "OpencodeDialogOptionHover",
+        "line_hl_group": "OmpDialogOptionHover",
         "ns_id": 3,
         "priority": 4096,
         "right_gravity": true
@@ -436,7 +410,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -456,7 +430,7 @@
         "virt_text": [
           [
             "› ",
-            "OpencodeDialogOptionHover"
+            "OmpDialogOptionHover"
           ]
         ],
         "virt_text_hide": false,
@@ -475,7 +449,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -495,7 +469,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -515,7 +489,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -535,7 +509,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -555,7 +529,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -575,7 +549,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -595,7 +569,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,
@@ -615,7 +589,7 @@
         "virt_text": [
           [
             "▌",
-            "OpencodeQuestionBorder"
+            "OmpQuestionBorder"
           ]
         ],
         "virt_text_hide": false,

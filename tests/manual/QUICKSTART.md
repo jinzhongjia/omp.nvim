@@ -9,7 +9,7 @@
 
 ## Once Neovim opens
 
-You'll see the OpenCode UI with an empty output buffer.
+You'll see the OMP UI with an empty output buffer.
 
 ### Step through events manually:
 ```vim
@@ -68,6 +68,6 @@ As you replay events, you'll see:
 ## Debugging tips
 
 - Watch `:messages` for event notifications
-- Use `:lua vim.print(require('opencode.state').messages)` to inspect state
+- Use `:lua vim.print(require('omp.state').messages)` to inspect state
 - Use `:ReplayNext` to step through problematic transitions
 - Use slower replay (`:ReplayAll 1000`) to see updates clearly
