@@ -387,7 +387,7 @@ function M.create_windows()
   windows.input_win = win_ids.input_win
   windows.output_win = win_ids.output_win
 
-  local filetype = config.ui.output.filetype or 'omp_output'
+  local filetype = config.ui.output.filetype or 'markdown'
   vim.api.nvim_win_call(windows.output_win, function()
     vim.api.nvim_set_option_value('filetype', filetype, { buf = windows.output_buf })
   end)

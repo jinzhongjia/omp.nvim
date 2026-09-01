@@ -132,7 +132,7 @@ M.defaults = {
       frames = { '⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏' },
     },
     output = {
-      filetype = 'omp_output',
+      filetype = 'markdown',
       time_format = nil,
       compact_assistant_headers = false,
       rendering = {

@@ -42,14 +42,14 @@ describe('ui.create_windows output filetype', function()
     windows = ui.create_windows()
 
     local filetype = vim.api.nvim_get_option_value('filetype', { buf = windows.output_buf })
-    assert.equals('omp_output', filetype)
+    assert.equals('markdown', filetype)
   end)
 
   it('uses configured output filetype', function()
     config.setup({
       ui = {
         output = {
-          filetype = 'markdown',
+          filetype = 'omp_output',
         },
       },
     })
@@ -57,7 +57,7 @@ describe('ui.create_windows output filetype', function()
     windows = ui.create_windows()
     local filetype = vim.api.nvim_get_option_value('filetype', { buf = windows.output_buf })
 
-    assert.equals('markdown', filetype)
+    assert.equals('omp_output', filetype)
   end)
 end)
 
