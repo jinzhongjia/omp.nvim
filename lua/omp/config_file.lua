@@ -46,28 +46,17 @@ M.get_omp_project = Promise.async(function()
   return result --[[@as OmpProject|nil]]
 end)
 
-local _providers_render_callback = false
-
 ---@return Promise<OmpProvidersResponse|nil>
 function M.get_omp_providers()
   if not M.providers_promise then
     local state = require('omp.state')
     M.providers_promise = state.api_client:list_providers()
   end
-  local wrapped = M.providers_promise:catch(function(err)
+  return M.providers_promise:catch(function(err)
     vim.notify('Error fetching Omp providers: ' .. vim.inspect(err), vim.log.levels.ERROR)
     M.providers_promise = nil
     return nil
   end)
-  if not _providers_render_callback then
-    _providers_render_callback = true
-    wrapped:finally(function()
-      local ok, _ = pcall(function()
-        require('omp.ui.topbar').render()
-      end)
-    end)
-  end
-  return wrapped
 end
 
 --- Get model information for a specific provider and model

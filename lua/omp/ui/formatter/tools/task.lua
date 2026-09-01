@@ -1,39 +1,16 @@
 local M = {}
 local icons = require('omp.ui.icons')
 
----@param part OmpMessagePart
----@param status string
----@param utils table
----@return string
-function M.tool_action_line(part, status, utils)
-  local tool_formatters = require('omp.ui.formatter.tools')
-  local tool = part.tool
-  local input = part.state and part.state.input or {}
-  local metadata = part.state and part.state.metadata or {}
-  local formatter = tool_formatters[tool] or tool_formatters.tool
-  local summary = formatter.summary or tool_formatters.tool.summary
-  local icon, tool_label, tool_value = summary(part, input, metadata)
-
-  if status ~= 'completed' then
-    icon = icons.get(status)
-  end
-
-  return utils.build_action_line(icon, tool_label or tool or 'tool', tool_value)
-end
-
 ---@param output Output
 ---@param part OmpMessagePart
----@param context? FormatterContext
+---@param _context? FormatterContext
 function M.format(output, part, _context)
   if part.tool ~= 'task' then
     return
   end
 
   local input = part.state and part.state.input or {}
-  local metadata = part.state and part.state.metadata or {}
   local tool_output = part.state and part.state.output or ''
-
-  local start_line = output:get_line_count() + 1
 
   local description = input.description or ''
   local agent_type = input.subagent_type

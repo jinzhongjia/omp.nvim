@@ -375,7 +375,7 @@ function M.create_windows()
 
   local autocmds = require('omp.ui.autocmds')
 
-  if not require('omp.ui.ui').is_omp_focused() then
+  if not M.is_omp_focused() then
     state.ui.set_code_context(vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf())
   end
 
@@ -567,20 +567,6 @@ function M.toggle_pane()
   else
     input_window.focus_input()
   end
-end
-
----Swap the split position and reopen the UI.
-function M.swap_position()
-  local ui_conf = config.ui
-  local new_pos = (ui_conf.position == 'left') and 'right' or 'left'
-  config.values.ui.position = new_pos
-
-  if state.windows then
-    M.close_windows(state.windows, false)
-  end
-  vim.schedule(function()
-    require('omp.api').toggle(state.active_session == nil)
-  end)
 end
 
 ---Toggle the current Omp window width between normal and zoomed.

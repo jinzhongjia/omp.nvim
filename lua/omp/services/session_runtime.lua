@@ -152,7 +152,7 @@ M.open = Promise.async(function(opts)
 
   state.ui.set_opening(true)
 
-  if not require('omp.ui.ui').is_omp_focused() then
+  if not ui.is_omp_focused() then
     require('omp.context').load()
   end
 
@@ -379,7 +379,12 @@ M.handle_directory_change = Promise.async(function()
 end)
 
 function M.paste_image_from_clipboard()
-  return image_handler.paste_image_from_clipboard()
+  return image_handler.paste_image_from_clipboard(function(path)
+    require('omp.ui.mention').mention(function(mention_cb)
+      mention_cb(vim.fn.fnamemodify(path, ':t'))
+      context.add_file(path)
+    end)
+  end)
 end
 
 function M.setup()

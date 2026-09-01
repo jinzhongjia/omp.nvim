@@ -1,8 +1,19 @@
 local Promise = require('omp.promise')
 local Process = require('omp.rpc.process')
 local Adapter = require('omp.rpc.adapter')
-local config = require('omp.config')
 local log = require('omp.log')
+
+local session_metadata_cache = {}
+
+---@param listeners function[]
+---@return function[]
+local function snapshot_listeners(listeners)
+  local snapshot = {}
+  for index, listener in ipairs(listeners) do
+    snapshot[index] = listener
+  end
+  return snapshot
+end
 
 ---@class OmpApiClient
 ---@field cwd string
@@ -53,6 +64,18 @@ local function workspace_session_dir(cwd)
 end
 
 local function read_session(path)
+  local stat = vim.uv.fs_stat(path)
+  if not stat then
+    session_metadata_cache[path] = nil
+    return nil
+  end
+  local mtime = stat.mtime or {}
+  local fingerprint = string.format('%d:%d:%d', stat.size or 0, mtime.sec or 0, mtime.nsec or 0)
+  local cached = session_metadata_cache[path]
+  if cached and cached.fingerprint == fingerprint then
+    return vim.deepcopy(cached.session)
+  end
+
   local ok, lines = pcall(vim.fn.readfile, path, '', 32)
   if not ok then
     return nil
@@ -72,13 +95,13 @@ local function read_session(path)
     end
   end
   if not header or not header.id then
+    session_metadata_cache[path] = nil
     return nil
   end
-  local stat = vim.uv.fs_stat(path)
-  local updated = stat and stat.mtime and stat.mtime.sec * 1000 or 0
+  local updated = mtime.sec and mtime.sec * 1000 or 0
   local created = header.timestamp and (vim.fn.strptime('%Y-%m-%dT%H:%M:%S', header.timestamp:sub(1, 19)) * 1000)
     or updated
-  return {
+  local session = {
     id = header.id,
     title = title or (header.title ~= '' and header.title) or 'New session',
     directory = header.cwd,
@@ -87,6 +110,8 @@ local function read_session(path)
     time = { created = created, updated = updated },
     sessionPath = path,
   }
+  session_metadata_cache[path] = { fingerprint = fingerprint, session = vim.deepcopy(session) }
+  return session
 end
 
 local function scan_dir(path)
@@ -110,7 +135,8 @@ local function scan_dir(path)
   return sessions
 end
 
-local function scan_all_sessions()
+---@param skip_path? string
+local function scan_all_sessions(skip_path)
   local sessions = {}
   local handle = vim.uv.fs_scandir(session_root())
   if not handle then
@@ -122,19 +148,23 @@ local function scan_all_sessions()
       break
     end
     if type_ == 'directory' then
-      vim.list_extend(sessions, scan_dir(vim.fs.joinpath(session_root(), name)))
+      local path = vim.fs.joinpath(session_root(), name)
+      if path ~= skip_path then
+        vim.list_extend(sessions, scan_dir(path))
+      end
     end
   end
   return sessions
 end
 
 local function find_session(id, cwd)
-  for _, session in ipairs(scan_dir(workspace_session_dir(cwd))) do
+  local project_path = workspace_session_dir(cwd)
+  for _, session in ipairs(scan_dir(project_path)) do
     if session.id == id then
       return session
     end
   end
-  for _, session in ipairs(scan_all_sessions()) do
+  for _, session in ipairs(scan_all_sessions(project_path)) do
     if session.id == id then
       return session
     end
@@ -227,7 +257,7 @@ function OmpApiClient:_emit(event)
   if event.type == 'session.idle' and session_id and self.run_promises[session_id] then
     self.run_promises[session_id]:resolve(true)
   end
-  for _, listener in ipairs(vim.deepcopy(self.listeners)) do
+  for _, listener in ipairs(snapshot_listeners(self.listeners)) do
     local ok, err = pcall(listener, event)
     if not ok then
       log.error('omp event listener failed: ' .. tostring(err))
@@ -268,9 +298,14 @@ end
 
 ---@return Promise<OmpApiClient>
 function OmpApiClient:start()
-  if self.control then
+  if self.control and self.control:is_running() then
     return self.spawn_promise
   end
+  if self.control then
+    self.adapters[self.control] = nil
+  end
+
+  self.spawn_promise = Promise.new()
   self.control = Process.new({ cwd = self.cwd, no_session = true })
   self:_attach(self.control, Adapter.new())
   self.control
@@ -406,7 +441,7 @@ function OmpApiClient:_spawn_session(existing, opts)
     local session = self:_session_from_state(data, existing)
     adapter:set_session_id(session.id)
     self.processes[session.id] = process
-    return process, session
+    return { process = process, session = session }
   end)()
 end
 
@@ -420,7 +455,7 @@ function OmpApiClient:_ensure_session_process(session_id)
     return reject('OMP session not found: ' .. tostring(session_id))
   end
   return self:_spawn_session(existing):and_then(function(spawned)
-    return spawned
+    return spawned.process
   end)
 end
 
@@ -507,9 +542,8 @@ end
 
 function OmpApiClient:create_session(session_data)
   return Promise.async(function()
-    local process = self:_spawn_session(nil):await()
-    local state = process:request({ type = 'get_state' }):await()
-    local session = self.sessions[state.sessionId]
+    local spawned = self:_spawn_session(nil):await()
+    local process, session = spawned.process, spawned.session
     if session_data and type(session_data) == 'table' and session_data.title then
       process:request({ type = 'set_session_name', name = session_data.title }):await()
       session.title = session_data.title
@@ -519,9 +553,8 @@ function OmpApiClient:create_session(session_data)
 end
 function OmpApiClient:create_ephemeral_session(title)
   return Promise.async(function()
-    local process = self:_spawn_session(nil, { no_session = true }):await()
-    local data = process:request({ type = 'get_state' }):await()
-    local session = self.sessions[data.sessionId]
+    local spawned = self:_spawn_session(nil, { no_session = true }):await()
+    local process, session = spawned.process, spawned.session
     session.ephemeral = true
     if title and title ~= '' then
       process:request({ type = 'set_session_name', name = title }):await()

@@ -80,7 +80,10 @@ local command_source = {
         vim.defer_fn(function()
           item.data.fn()
         end, 10) -- slight delay to allow completion menu to close,
-        require('omp.ui.input_window').set_content('')
+        local windows = require('omp.state').windows
+        if windows and windows.input_buf and vim.api.nvim_buf_is_valid(windows.input_buf) then
+          vim.api.nvim_buf_set_lines(windows.input_buf, 0, -1, false, { '' })
+        end
       else
         vim.notify('Command not found: ' .. item.label, vim.log.levels.ERROR)
       end

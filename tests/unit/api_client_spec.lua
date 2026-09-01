@@ -156,6 +156,44 @@ describe('OMP API client', function()
     restore()
   end)
 
+  it('recreates the control process after an unexpected exit', function()
+    local created, restore = fake_process_factory({ {}, {} })
+    local client = api_client.new('/tmp/project')
+    client:start():wait(1000)
+    local first = client.control
+    first.running = false
+
+    client:list_providers():wait(1000)
+
+    assert.equals(2, #created)
+    assert.is_not_equal(first, client.control)
+    assert.is_nil(client.adapters[first])
+    client:shutdown():wait(1000)
+    restore()
+  end)
+
+  it('uses the state returned during session spawn without a duplicate request', function()
+    local created, restore = fake_process_factory({
+      {
+        sessionId = 'session-1',
+        sessionFile = '/tmp/project/session-1.jsonl',
+      },
+    })
+    local client = api_client.new('/tmp/project')
+
+    client:create_session(false):wait(1000)
+
+    local get_state_count = 0
+    for _, request in ipairs(created[1].requests) do
+      if request.type == 'get_state' then
+        get_state_count = get_state_count + 1
+      end
+    end
+    assert.equals(1, get_state_count)
+    client:shutdown():wait(1000)
+    restore()
+  end)
+
   it('shuts down the control process and every opened session process', function()
     local created, restore = fake_process_factory({
       {},
@@ -300,7 +338,11 @@ describe('OMP API client', function()
       assert.is_not_equal('set_session_name', request.type)
     end
     assert.equals(1, #prompt_requests)
-    local expected = '<context>' .. string.char(10) .. 'context' .. string.char(10) .. '</context>'
+    local expected = '<context>'
+      .. string.char(10)
+      .. 'context'
+      .. string.char(10)
+      .. '</context>'
       .. string.char(10, 10)
       .. 'Fix this'
       .. string.char(10)

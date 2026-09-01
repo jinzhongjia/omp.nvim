@@ -9,7 +9,12 @@ local title_extension = vim.fs.joinpath(vim.fs.dirname(debug.getinfo(1, 'S').sou
 ---@field extra_args? string[]
 ---@field resume? string
 ---@field no_session? boolean
+---@field timeout? integer
 ---@field on_stderr? fun(data: string)
+
+---@class OmpRpcPendingRequest
+---@field promise Promise<any>
+---@field timer? table
 
 ---@class OmpRpcProcess
 ---@field cwd string
@@ -17,7 +22,8 @@ local title_extension = vim.fs.joinpath(vim.fs.dirname(debug.getinfo(1, 'S').sou
 ---@field extra_args string[]
 ---@field resume? string
 ---@field no_session boolean
----@field job? vim.SystemObj
+---@field timeout integer
+---@field job? table
 ---@field pid? integer
 ---@field url string
 ---@field mode string
@@ -25,15 +31,38 @@ local title_extension = vim.fs.joinpath(vim.fs.dirname(debug.getinfo(1, 'S').sou
 ---@field max_reassembled_frame_bytes integer
 ---@field spawn_promise Promise<OmpRpcProcess>
 ---@field shutdown_promise Promise<boolean>
----@field pending table<string, Promise<any>>
+---@field pending table<string, OmpRpcPendingRequest>
 ---@field listeners fun(frame: table)[]
 ---@field stderr string[]
 ---@field private _next_id integer
 ---@field private _stdout_buffer string
 ---@field private _chunk? {id: string, count: integer, byte_length: integer, parts: string[]}
+---@field private _startup_timer? table
+---@field private _shutdown_timer? table
 ---@field private _stopping boolean
+---@field private _on_stderr? fun(data: string)
 local Process = {}
 Process.__index = Process
+
+local SHUTDOWN_GRACE_MS = 1000
+
+---@param timer? table
+local function close_timer(timer)
+  if timer and not timer:is_closing() then
+    timer:stop()
+    timer:close()
+  end
+end
+
+---@param listeners function[]
+---@return function[]
+local function snapshot_listeners(listeners)
+  local snapshot = {}
+  for index, listener in ipairs(listeners) do
+    snapshot[index] = listener
+  end
+  return snapshot
+end
 
 ---@param opts OmpRpcProcessOpts
 ---@return OmpRpcProcess
@@ -47,6 +76,7 @@ function Process.new(opts)
     extra_args = vim.deepcopy(opts.extra_args or rpc.extra_args or {}),
     resume = opts.resume,
     no_session = opts.no_session == true,
+    timeout = opts.timeout or rpc.timeout or 10000,
     job = nil,
     pid = nil,
     url = 'stdio://omp',
@@ -61,6 +91,8 @@ function Process.new(opts)
     _next_id = 0,
     _stdout_buffer = '',
     _chunk = nil,
+    _startup_timer = nil,
+    _shutdown_timer = nil,
     _stopping = false,
     _on_stderr = opts.on_stderr,
   }, Process)
@@ -83,9 +115,10 @@ end
 
 ---@param reason any
 function Process:_reject_pending(reason)
-  for id, promise in pairs(self.pending) do
+  for id, request in pairs(self.pending) do
     self.pending[id] = nil
-    promise:reject(reason)
+    close_timer(request.timer)
+    request.promise:reject(reason)
   end
 end
 
@@ -97,34 +130,41 @@ function Process:_dispatch(frame)
       self
         :_request_now({ type = 'negotiate_protocol', protocolVersion = 2 })
         :and_then(function(data)
+          close_timer(self._startup_timer)
+          self._startup_timer = nil
           self.protocol_version = data and data.protocolVersion or 2
           self.spawn_promise:resolve(self)
         end)
         :catch(function(err)
+          close_timer(self._startup_timer)
+          self._startup_timer = nil
           self.spawn_promise:reject('omp RPC v2 negotiation failed: ' .. tostring(err))
           self:shutdown()
         end)
     else
+      close_timer(self._startup_timer)
+      self._startup_timer = nil
       self.spawn_promise:resolve(self)
     end
     return
   end
 
   if frame.type == 'response' and frame.id then
-    local pending = self.pending[frame.id]
-    if not pending then
+    local request = self.pending[frame.id]
+    if not request then
       return
     end
     self.pending[frame.id] = nil
+    close_timer(request.timer)
     if frame.success then
-      pending:resolve(frame.data)
+      request.promise:resolve(frame.data)
     else
-      pending:reject(frame.error or ('omp RPC command failed: ' .. tostring(frame.command)))
+      request.promise:reject(frame.error or ('omp RPC command failed: ' .. tostring(frame.command)))
     end
     return
   end
 
-  for _, listener in ipairs(vim.deepcopy(self.listeners)) do
+  for _, listener in ipairs(snapshot_listeners(self.listeners)) do
     local ok, err = pcall(listener, frame)
     if not ok then
       log.error('omp RPC listener failed: ' .. tostring(err))
@@ -217,22 +257,27 @@ function Process:_on_stdout(data)
   if not data or data == '' then
     return
   end
-  self._stdout_buffer = self._stdout_buffer .. data
+  local buffer = self._stdout_buffer .. data
+  local start = 1
   while true do
-    local newline = self._stdout_buffer:find('\n', 1, true)
+    local newline = buffer:find('\n', start, true)
     if not newline then
       break
     end
-    local line = self._stdout_buffer:sub(1, newline - 1):gsub('\r$', '')
-    self._stdout_buffer = self._stdout_buffer:sub(newline + 1)
+    local line = buffer:sub(start, newline - 1):gsub('\r$', '')
     self:_handle_line(line)
+    start = newline + 1
   end
+  self._stdout_buffer = start > 1 and buffer:sub(start) or buffer
 end
 
 ---@return Promise<OmpRpcProcess>
 function Process:start()
   if self.job then
     return self.spawn_promise
+  end
+  if self.spawn_promise:is_resolved() then
+    return Promise.new():reject('omp RPC process instances cannot be restarted')
   end
 
   local ok, job_or_error = pcall(vim.system, self:_command(), {
@@ -256,6 +301,10 @@ function Process:start()
       end
     end,
   }, function(result)
+    close_timer(self._startup_timer)
+    close_timer(self._shutdown_timer)
+    self._startup_timer = nil
+    self._shutdown_timer = nil
     self.pid = nil
     self.job = nil
     local reason = string.format('omp RPC process exited (code=%s, signal=%s)', result.code, result.signal)
@@ -270,26 +319,66 @@ function Process:start()
     self.spawn_promise:reject(job_or_error)
     return self.spawn_promise
   end
+  ---@cast job_or_error table
 
   self.job = job_or_error
   self.pid = job_or_error.pid
+  if self.timeout > 0 then
+    local timer = assert(vim.uv.new_timer(), 'failed to create RPC startup timer')
+    self._startup_timer = timer
+    timer:start(
+      self.timeout,
+      0,
+      vim.schedule_wrap(function()
+        if self._startup_timer ~= timer or self.spawn_promise:is_resolved() then
+          return
+        end
+        self._startup_timer = nil
+        close_timer(timer)
+        self.spawn_promise:reject(string.format('omp RPC startup timed out after %dms', self.timeout))
+        local job = self.job
+        if job then
+          pcall(job.kill, job, 15)
+        end
+      end)
+    )
+  end
   return self.spawn_promise
 end
 
 ---@param command table
 ---@return Promise<any>
 function Process:_request_now(command)
-  if not self.job then
+  local job = self.job
+  if not job then
     return Promise.new():reject('omp RPC process is not running')
   end
   self._next_id = self._next_id + 1
   local id = command.id or string.format('nvim-%d', self._next_id)
   command = vim.tbl_extend('force', command, { id = id })
   local promise = Promise.new()
-  self.pending[id] = promise
-  local ok, err = pcall(self.job.write, self.job, vim.json.encode(command) .. '\n')
+  local request = { promise = promise }
+  self.pending[id] = request
+  if self.timeout > 0 then
+    local timer = assert(vim.uv.new_timer(), 'failed to create RPC request timer')
+    request.timer = timer
+    timer:start(
+      self.timeout,
+      0,
+      vim.schedule_wrap(function()
+        if self.pending[id] ~= request then
+          return
+        end
+        self.pending[id] = nil
+        close_timer(timer)
+        promise:reject(string.format('omp RPC request %s timed out after %dms', tostring(command.type), self.timeout))
+      end)
+    )
+  end
+  local ok, err = pcall(job.write, job, vim.json.encode(command) .. '\n')
   if not ok then
     self.pending[id] = nil
+    close_timer(request.timer)
     promise:reject(err)
   end
   return promise
@@ -305,10 +394,11 @@ end
 ---@param frame table
 ---@return boolean, any
 function Process:send(frame)
-  if not self.job then
+  local job = self.job
+  if not job then
     return false, 'omp RPC process is not running'
   end
-  return pcall(self.job.write, self.job, vim.json.encode(frame) .. '\n')
+  return pcall(job.write, job, vim.json.encode(frame) .. '\n')
 end
 
 ---@param listener fun(frame: table)
@@ -339,9 +429,25 @@ function Process:shutdown()
   end
   if not self._stopping then
     self._stopping = true
-    local ok = pcall(self.job.write, self.job, nil)
+    local job = assert(self.job)
+    local ok = pcall(job.write, job, nil)
     if not ok then
-      pcall(self.job.kill, self.job, 15)
+      pcall(job.kill, job, 15)
+    else
+      local timer = assert(vim.uv.new_timer(), 'failed to create RPC shutdown timer')
+      self._shutdown_timer = timer
+      timer:start(
+        SHUTDOWN_GRACE_MS,
+        0,
+        vim.schedule_wrap(function()
+          if self._shutdown_timer ~= timer or self.job ~= job then
+            return
+          end
+          self._shutdown_timer = nil
+          close_timer(timer)
+          pcall(job.kill, job, 15)
+        end)
+      )
     end
   end
   return self.shutdown_promise

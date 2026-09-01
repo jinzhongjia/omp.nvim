@@ -68,7 +68,10 @@ local skill_source = {
         return require('omp.services.messaging').send_message(item.data.content, {})
       end)
     end, 10)
-    require('omp.ui.input_window').set_content('')
+    local windows = require('omp.state').windows
+    if windows and windows.input_buf and vim.api.nvim_buf_is_valid(windows.input_buf) then
+      vim.api.nvim_buf_set_lines(windows.input_buf, 0, -1, false, { '' })
+    end
   end,
   get_trigger_character = function()
     local config = require('omp.config')

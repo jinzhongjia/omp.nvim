@@ -2,6 +2,7 @@ local EventManager = require('omp.event_manager')
 local Promise = require('omp.promise')
 local state = require('omp.state')
 local config = require('omp.config')
+local ThrottlingEmitter = require('omp.throttling_emitter')
 
 describe('EventManager', function()
   local event_manager
@@ -327,5 +328,29 @@ describe('EventManager', function()
 
       assert.is_true(autocmd_called)
     end)
+  end)
+end)
+
+describe('ThrottlingEmitter', function()
+  it('invalidates a deferred drain when cleared', function()
+    local original_defer = vim.defer_fn
+    local deferred = {}
+    local drained = {}
+    vim.defer_fn = function(callback)
+      table.insert(deferred, callback)
+    end
+    local emitter = ThrottlingEmitter.new(function(items)
+      table.insert(drained, items)
+    end, 40)
+
+    emitter:enqueue('stale')
+    emitter:clear()
+    emitter:enqueue('current')
+    deferred[1]()
+    deferred[2]()
+    vim.defer_fn = original_defer
+
+    assert.equals(1, #drained)
+    assert.same({ 'current' }, drained[1])
   end)
 end)

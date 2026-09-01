@@ -99,6 +99,9 @@ function M.setup()
   state.store.subscribe('tokens_count', on_change)
   state.store.subscribe('cost', on_change)
   state.store.subscribe('is_opening', on_change)
+  if state.api_client and type(state.api_client.list_providers) == 'function' then
+    config_file.get_omp_providers():finally(M.render)
+  end
   M.render()
 end
 

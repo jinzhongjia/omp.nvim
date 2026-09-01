@@ -319,7 +319,6 @@ function M._render_full_session_data(session_data, opts)
   opts = opts or {}
   -- Read before reset() clears it
   local lazy_limit = ctx.lazy_render_count
-  local t_start = vim.uv.hrtime()
   M.reset()
   state.renderer.set_messages(session_data or {})
 
@@ -342,7 +341,6 @@ function M._render_full_session_data(session_data, opts)
     visible_messages = vim.list_slice(visible_messages, #visible_messages - lazy_limit + 1)
   end
 
-  local t_format_start = vim.uv.hrtime()
   flush.begin_bulk_mode()
 
   if hidden_count > 0 then
@@ -366,10 +364,8 @@ function M._render_full_session_data(session_data, opts)
     end
   end
 
-  local t_format_end = vim.uv.hrtime()
   flush.flush()
   flush.end_bulk_mode()
-  local t_flush_end = vim.uv.hrtime()
 
   if opts.restore_model_from_messages then
     require('omp.services.agent_model').initialize_current_model({ restore_from_messages = true })
