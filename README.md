@@ -1,42 +1,44 @@
 # omp.nvim
 
-在 Neovim 内使用 [oh-my-pi](https://github.com/can1357/oh-my-pi) 的聊天界面。
+A Neovim chat interface for [oh-my-pi](https://github.com/can1357/oh-my-pi).
 
-本项目继承 sudo-tee/opencode.nvim 的 UI 与上下文能力，后端已完整切换为 `omp --mode rpc`：Neovim 启动长期运行的 omp 子进程，通过 stdin/stdout NDJSON 收发命令与流式事件，不再启动 opencode HTTP 服务，也不依赖 curl 或 SSE。
+This project retains the UI and editor-context capabilities of sudo-tee/opencode.nvim while replacing its backend with `omp --mode rpc`. Neovim communicates with long-running omp subprocesses over stdin/stdout NDJSON. It does not start an opencode HTTP server and does not depend on curl or SSE.
 
-## 功能
+## Features
 
-- Neovim 内聊天面板与 Markdown 流式渲染
-- 当前文件、选区、诊断、光标和 Git diff 上下文
-- omp 工具调用、思考内容和错误状态展示
-- omp 持久化会话的新建、选择、恢复和重命名
-- 模型选择与思考级别切换
-- `extension_ui_request` 权限确认
-- 请求取消、会话压缩、图片输入和斜杠命令
-- 每个会话独立的 `omp --mode rpc` 进程；控制面使用 `--no-session`
-- RPC v2 协商及大帧 `rpc_chunk` 重组
+- In-editor chat panel with streaming Markdown rendering
+- Current file, visual selection, diagnostics, cursor, and Git diff context
+- omp tool-call, thinking, and error-state rendering
+- Create, select, resume, and rename persistent omp sessions
+- Model selection and OMP thinking-level controls
+- Permission handling through `extension_ui_request`
+- Request cancellation, compaction, image input, and slash commands
+- One isolated `omp --mode rpc` process per opened session
+- A separate ephemeral control process for model, command, and configuration queries
+- RPC v2 negotiation and lossless `rpc_chunk` reassembly
+- Ephemeral Quick Chat through `omp --mode rpc --no-session`
 
-## 要求
+## Requirements
 
 - Neovim 0.10+
 - omp 18.0.11+
-- 已完成 omp provider 登录或 API Key 配置
+- An authenticated omp provider or configured API key
 
-确认安装：
+Verify the CLI installation:
 
 ```sh
 omp --version
 ```
 
-插件健康检查：
+Run the plugin health check:
 
 ```vim
 :checkhealth omp
 ```
 
-## 安装
+## Installation
 
-lazy.nvim：
+With lazy.nvim:
 
 ```lua
 {
@@ -47,7 +49,7 @@ lazy.nvim：
 }
 ```
 
-## 配置
+## Configuration
 
 ```lua
 require('omp').setup({
@@ -71,99 +73,102 @@ require('omp').setup({
 })
 ```
 
-配置使用深合并；只需覆盖需要修改的字段。
+Configuration is deep-merged. Only override the fields you need.
 
-## 使用
+## Usage
 
 ```vim
 :Omp toggle
 :Omp open_input
 :Omp open_input_new_session
 :Omp select_session
-:Omp rename_session 新名称
+:Omp session rename New name
+:Omp thinking_level
 :Omp diff open
 :Omp cancel
 ```
 
-默认按键前缀为 `<leader>o`。主要按键：
+The default keymap prefix is `<leader>o`.
 
-| 按键 | 功能 |
+| Key | Action |
 |---|---|
-| `<leader>og` | 切换聊天窗口 |
-| `<leader>oi` | 打开输入窗口 |
-| `<leader>oI` | 新会话中打开输入窗口 |
-| `<leader>os` | 选择会话 |
-| `<leader>op` | 选择模型 |
-| `<leader>oV` | 选择 OMP thinking level |
-| `<leader>ov` | 粘贴图片 |
-| `<leader>od` | 查看当前 Git diff |
-| `<leader>o/` | Quick Chat（独立 `--no-session` 进程） |
-| `<C-c>` | 取消当前请求 |
+| `<leader>og` | Toggle the chat panel |
+| `<leader>oi` | Open the input window |
+| `<leader>oI` | Open the input window in a new session |
+| `<leader>os` | Select a session |
+| `<leader>op` | Select a model |
+| `<leader>oV` | Select an OMP thinking level |
+| `<leader>ov` | Paste an image |
+| `<leader>od` | Open the current Git diff |
+| `<leader>o/` | Start an ephemeral Quick Chat |
+| `<C-c>` | Cancel the active request |
 
-Lua API：
+Lua API:
 
 ```lua
 local omp = require('omp.api')
 omp.toggle()
-omp.run('解释当前文件')
-omp.run_new_session('审查当前改动')
+omp.run('Explain the current file')
+omp.run_new_session('Review the current changes')
 ```
 
-## 会话
+## Sessions
 
-omp 会话由 omp 自身保存到：
+omp stores persistent sessions under:
 
 ```text
-~/.omp/agent/sessions/<工作目录编码>/*.jsonl
+~/.omp/agent/sessions/<encoded-working-directory>/*.jsonl
 ```
 
-插件只扫描会话元数据。打开历史会话时，会为该会话启动独立 RPC 进程并使用 `--resume <session-file>` 恢复上下文。
+The plugin only scans session metadata. Opening a historical session starts a dedicated RPC process with `--resume <session-file>`.
 
-### 进程与复用模型
+### Process and reuse model
 
-- 插件维护一个 `omp --mode rpc --no-session` 控制进程，用于查询模型、命令和配置。
-- 每个实际打开的会话拥有一个独立的长期运行 RPC 进程；仅在 picker 中列出会话不会启动进程。
-- 新会话启动 `omp --mode rpc`；历史会话启动 `omp --mode rpc --resume <session-file>`。
-- 再次切回仍在运行的同一会话时会复用原进程，不会重复启动。
-- 打开 $N$ 个会话时通常有 $N+1$ 个 omp 进程；额外的一个是无持久化控制进程。
-- Neovim 退出时，插件会关闭控制进程及全部会话进程。
+- One `omp --mode rpc --no-session` control process handles model, command, and configuration queries.
+- Every opened chat session owns one long-running RPC process. Listing a session in the picker does not start it.
+- A new session starts `omp --mode rpc`.
+- A historical session starts `omp --mode rpc --resume <session-file>`.
+- Switching back to an already running session reuses its process instead of starting a duplicate.
+- Opening $N$ sessions normally results in $N+1$ omp processes; the extra process is the ephemeral control process.
+- Neovim shuts down the control process and every session process on exit.
 
-omp RPC 虽提供 `switch_session`，但跨会话共享一个进程会失去并行能力，并增加流式事件、权限请求和取消操作串线的风险，因此当前选择一会话一进程。外部已经运行的 omp TUI 不能复用：RPC 传输依赖该子进程专属的 stdin/stdout。
+OMP RPC provides `switch_session`, but sharing one process across multiple sessions would prevent concurrent runs and make streaming events, permission requests, and cancellation state easier to mix up. The plugin therefore uses one process per independently controlled session. It also cannot attach to an already running external omp TUI because RPC transport requires ownership of that process's stdin/stdout.
 
-## 当前边界
+## Backend-specific boundaries
 
-以下 opencode.nvim 专属 UI 没有等价的 OMP RPC 数据模型，已从命令、按键和渲染状态中移除：
+The following opencode.nvim UI concepts do not have an equivalent OMP RPC data model and have been removed from commands, keymaps, and renderer state:
 
-- snapshot/timeline undo/redo 与恢复点
-- MCP 连接管理面板；OMP 原生 `/mcp` 命令仍可用
-- 子会话树、child-session 跳转和基于 opencode message ID 的 fork
-- 会话删除
-- agent mode、`DEFAULT/BUILD/PLAN` 标签和 variant 概念
+- Snapshot/timeline undo and redo, restore points, and message revert UI
+- The MCP connection-management panel; OMP's native `/mcp` command remains available
+- Child-session trees, child-session navigation, and message-ID-based forks
+- Session deletion
+- Agent modes, `DEFAULT/BUILD/PLAN` labels, and model variants
 
-OMP 原生 slash commands（包括 `/share`、`/mcp`、`/review`）直接由 RPC 命令列表提供。Diff 面板仅展示当前 Git 工作区改动。
+OMP-native slash commands, including `/share`, `/mcp`, and `/review`, are provided directly from the RPC command list. The diff panel shows current Git working-tree changes only.
 
-## 开发
+## Development
 
-定向测试：
+Run focused RPC tests:
 
 ```sh
 ./run_tests.sh -t tests/unit/api_client_spec.lua
 ./run_tests.sh -t tests/unit/rpc_process_spec.lua
 ./run_tests.sh -t tests/unit/rpc_adapter_spec.lua
+./run_tests.sh -t tests/unit/thinking_level_picker_spec.lua
 ```
 
-完整测试：
+Run the complete test suite:
 
 ```sh
 ./run_tests.sh
 ```
 
-架构依赖检查：
+Inspect the current dependency topology:
 
 ```sh
 uv run --with json5 python scripts/dependency-topology/scan_topology.py scan --snapshot worktree
 ```
 
-## 许可证与来源
+## License and attribution
 
-Apache-2.0。本项目基于 sudo-tee/opencode.nvim 改造，保留原项目版权与许可证声明；后端集成面来自 oh-my-pi 官方 RPC 协议。
+Apache-2.0. This project is derived from sudo-tee/opencode.nvim and retains the original copyright and license notices. The backend integration targets the official oh-my-pi RPC protocol.
