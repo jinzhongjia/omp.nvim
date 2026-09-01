@@ -210,19 +210,7 @@ function M.format_message_header(message, previous_message)
 
   local debug_text = config.debug.show_ids and ' [' .. message.info.id .. ']' or ''
 
-  local display_name
-  if role == 'assistant' then
-    local mode = message.info.mode
-    if mode and mode ~= '' then
-      display_name = mode:upper()
-    elseif state.current_mode and state.current_mode ~= '' then
-      display_name = state.current_mode:upper()
-    else
-      display_name = 'ASSISTANT'
-    end
-  else
-    display_name = role:upper()
-  end
+  local display_name = role == 'assistant' and 'ASSISTANT' or role:upper()
 
   local header_style = config.ui.output.compact_assistant_headers
   if header_style == true then
@@ -232,18 +220,13 @@ function M.format_message_header(message, previous_message)
     header_style = 'full'
   end
 
-  local same_mode_as_previous = false
+  local same_assistant_as_previous = false
   if (header_style == 'minimal' or header_style == 'hidden') and role == 'assistant' and previous_message then
     local previous_role = previous_message.info and previous_message.info.role or nil
-    local previous_mode = previous_message.info and previous_message.info.mode or state.current_mode
-    local current_mode = message.info.mode or state.current_mode
-    same_mode_as_previous = previous_role == 'assistant'
-      and current_mode
-      and current_mode ~= ''
-      and current_mode == previous_mode
+    same_assistant_as_previous = previous_role == 'assistant'
   end
 
-  if not same_mode_as_previous then
+  if not same_assistant_as_previous then
     output:add_lines(M.separator)
   else
     if header_style ~= 'hidden' then
@@ -251,7 +234,7 @@ function M.format_message_header(message, previous_message)
     end
   end
 
-  if not same_mode_as_previous then
+  if not same_assistant_as_previous then
     output:add_extmark(output:get_line_count() - 1, {
       virt_text = {
         { icon, role_hl },
@@ -268,7 +251,7 @@ function M.format_message_header(message, previous_message)
 
   if time and (role ~= 'assistant' or header_style ~= 'hidden') then
     output:add_extmark(output:get_line_count() - 1, {
-      virt_text = { { (same_mode_as_previous and '' or ' ') .. util.format_time(time), 'OmpHint' } },
+      virt_text = { { (same_assistant_as_previous and '' or ' ') .. util.format_time(time), 'OmpHint' } },
       virt_text_pos = 'right_align',
       priority = 9,
     } --[[@as OutputExtmark]])
@@ -289,9 +272,11 @@ function M.format_message_header(message, previous_message)
     M._format_callout(output, 'ERROR', error_message)
   end
 
-  local hidden_same_mode_assistant_header = role == 'assistant' and header_style == 'hidden' and same_mode_as_previous
+  local hidden_consecutive_assistant_header = role == 'assistant'
+    and header_style == 'hidden'
+    and same_assistant_as_previous
 
-  if not hidden_same_mode_assistant_header then
+  if not hidden_consecutive_assistant_header then
     output:add_line('')
   end
 

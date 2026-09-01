@@ -81,24 +81,24 @@ describe('slash command mapping', function()
     package.loaded['omp.log'] = nil
   end)
 
-  it('maps builtin preset /agent to ParsedIntent and dispatches', function()
+  it('maps builtin /models to ParsedIntent and dispatches', function()
     local slash_commands = slash.get_commands():wait()
     local cmd
     for _, entry in ipairs(slash_commands) do
-      if entry.slash_cmd == '/agent' then
+      if entry.slash_cmd == '/models' then
         cmd = entry
         break
       end
     end
 
     assert.truthy(cmd)
-    cmd.fn({ 'build' })
+    cmd.fn({})
 
     assert.equal(1, #captured_parsed)
-    assert.same('agent', captured_parsed[1].intent.name)
-    assert.same({ 'select', 'build' }, captured_parsed[1].intent.args)
-    assert.same({ 'agent', 'select', 'build' }, captured_parsed[1].intent.source.argv)
-    assert.equal('agent select build', captured_parsed[1].intent.source.raw_args)
+    assert.same('models', captured_parsed[1].intent.name)
+    assert.same({}, captured_parsed[1].intent.args)
+    assert.same({ 'models' }, captured_parsed[1].intent.source.argv)
+    assert.equal('models', captured_parsed[1].intent.source.raw_args)
     assert.equal(1, #captured_ctx)
   end)
 

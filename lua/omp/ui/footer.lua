@@ -10,15 +10,6 @@ local function utf8_len(str)
   return vim.fn.strchars(str)
 end
 
-local function get_mode_highlight()
-  local mode = (state.current_mode or config.default_mode):lower()
-  local highlights = {
-    build = 'OmpAgentBuild',
-    plan = 'OmpAgentPlan',
-  }
-  return highlights[mode] or 'OmpAgentCustom'
-end
-
 local function build_left_segments()
   return {}
 end
@@ -41,11 +32,6 @@ local function build_right_segments()
     end
     table.insert(segments, { ' ' })
   end
-
-  table.insert(segments, {
-    string.format(' %s ', (state.current_mode or config.default_mode):upper()),
-    get_mode_highlight(),
-  })
 
   return segments
 end
@@ -143,7 +129,6 @@ function M.setup(windows)
 
   -- for model changes
   state.store.subscribe('current_model', on_change)
-  state.store.subscribe('current_mode', on_change)
   state.store.subscribe('current_variant', on_change)
   state.store.subscribe('active_session', on_change)
   -- to show C-c message
@@ -171,7 +156,6 @@ function M.close(preserve_buffer)
   end
 
   state.store.unsubscribe('current_model', on_change)
-  state.store.unsubscribe('current_mode', on_change)
   state.store.unsubscribe('current_variant', on_change)
   state.store.unsubscribe('active_session', on_change)
   state.store.unsubscribe('job_count', on_job_count_changed)

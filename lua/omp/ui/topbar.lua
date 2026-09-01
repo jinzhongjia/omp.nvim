@@ -93,7 +93,6 @@ local function on_change(_, _, _)
 end
 
 function M.setup()
-  state.store.subscribe('current_mode', on_change)
   state.store.subscribe('current_model', on_change)
   state.store.subscribe('active_session', on_change)
   state.store.subscribe('is_omp_focused', on_change)
@@ -104,7 +103,6 @@ function M.setup()
 end
 
 function M.close()
-  state.store.unsubscribe('current_mode', on_change)
   state.store.unsubscribe('current_model', on_change)
   state.store.unsubscribe('active_session', on_change)
   state.store.unsubscribe('is_omp_focused', on_change)

@@ -108,7 +108,7 @@ local function content_parts(message, session_id, message_id)
         })
       elseif block.type == 'thinking' then
         table.insert(result, {
-          id = string.format('%s-thinking-%d', message_id, index),
+          id = string.format('%s-reasoning-%d', message_id, index),
           messageID = message_id,
           sessionID = session_id,
           type = 'reasoning',
@@ -239,7 +239,7 @@ function Adapter:handle(frame)
     else
       return events
     end
-    local content_index = update.contentIndex or 1
+    local content_index = (tonumber(update.contentIndex) or 0) + 1
     local key = part_type .. ':' .. tostring(content_index)
     local part_id = self.part_ids[key]
     if not part_id then

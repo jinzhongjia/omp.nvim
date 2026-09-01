@@ -12,7 +12,7 @@ describe('omp RPC adapter', function()
 
     local delta = adapter:handle({
       type = 'message_update',
-      assistantMessageEvent = { type = 'text_delta', contentIndex = 1, delta = 'hello' },
+      assistantMessageEvent = { type = 'text_delta', contentIndex = 0, delta = 'hello' },
     })
     assert.same({
       type = 'message.part.delta',
@@ -24,6 +24,16 @@ describe('omp RPC adapter', function()
         delta = 'hello',
       },
     }, delta[1])
+
+    local ended = adapter:handle({
+      type = 'message_end',
+      message = {
+        id = 'message-1',
+        role = 'assistant',
+        content = { { type = 'text', text = 'hello' } },
+      },
+    })
+    assert.equals(delta[1].properties.partID, ended[2].properties.part.id)
   end)
 
   it('uses distinct part ids across assistant messages', function()
@@ -35,10 +45,32 @@ describe('omp RPC adapter', function()
       })
       local events = adapter:handle({
         type = 'message_update',
-        assistantMessageEvent = { type = 'text_delta', contentIndex = 1, delta = 'x' },
+        assistantMessageEvent = { type = 'text_delta', contentIndex = 0, delta = 'x' },
       })
       assert.equals('message-' .. index .. '-text-1', events[1].properties.partID)
     end
+  end)
+
+  it('uses the same reasoning part id for deltas and the final message', function()
+    local adapter = Adapter.new({ session_id = 'session-1' })
+    adapter:handle({
+      type = 'message_start',
+      message = { id = 'message-1', role = 'assistant', content = {} },
+    })
+    local delta = adapter:handle({
+      type = 'message_update',
+      assistantMessageEvent = { type = 'thinking_delta', contentIndex = 0, delta = 'thinking' },
+    })
+    local ended = adapter:handle({
+      type = 'message_end',
+      message = {
+        id = 'message-1',
+        role = 'assistant',
+        content = { { type = 'thinking', thinking = 'thinking' } },
+      },
+    })
+
+    assert.equals(delta[1].properties.partID, ended[2].properties.part.id)
   end)
 
   it('maps tool lifecycle and normalizes file paths', function()

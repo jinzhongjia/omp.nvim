@@ -202,12 +202,12 @@ describe('omp.api', function()
     it('reports invalid nested subcommand before execution', function()
       local notify_stub = stub(vim, 'notify')
 
-      local result = commands.execute_command_opts({ args = 'agent unknown', range = 0 })
+      local result = commands.execute_command_opts({ args = 'session unknown', range = 0 })
 
       assert.is_nil(result)
       assert
         .stub(notify_stub)
-        .was_called_with('Invalid agent subcommand. Use: plan, build, select', vim.log.levels.ERROR)
+        .was_called_with('Invalid session subcommand. Use: new, select, compact, rename, toggle_lock', vim.log.levels.ERROR)
 
       notify_stub:revert()
     end)

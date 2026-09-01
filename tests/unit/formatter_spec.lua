@@ -722,7 +722,7 @@ describe('formatter', function()
     assert.are.equal('Found `3` matches', output.lines[2])
   end)
 
-  it('falls back to current mode for assistant messages without a stamped mode', function()
+  it('renders assistant headers independently of compatibility mode state', function()
     state.model.set_mode('build')
     local output = formatter.format_message_header({
       info = {
@@ -733,10 +733,10 @@ describe('formatter', function()
       parts = {},
     })
 
-    assert.are.equal('BUILD', output.extmarks[1][1].virt_text[3][1])
+    assert.are.equal('ASSISTANT', output.extmarks[1][1].virt_text[3][1])
   end)
 
-  it('renders minimal same-mode assistant headers with only right-aligned time', function()
+  it('renders minimal consecutive assistant headers with only right-aligned time', function()
     config.setup({
       ui = {
         output = {
@@ -806,7 +806,7 @@ describe('formatter', function()
     assert.is_nil(output.extmarks[0])
   end)
 
-  it('does not add a spacing-only block for hidden same-mode assistant messages', function()
+  it('does not add a spacing-only block for hidden consecutive assistant messages', function()
     config.setup({
       ui = {
         output = {
@@ -860,38 +860,18 @@ describe('formatter', function()
     assert.are.same({ 'First reply', '', 'Second reply', '' }, combined_lines)
   end)
 
-  it('keeps full assistant headers when the mode changes', function()
-    config.setup({
-      ui = {
-        output = {
-          compact_assistant_headers = true,
-        },
-      },
-    })
-
+  it('ignores legacy mode stamps in assistant headers', function()
     local output = formatter.format_message_header({
       info = {
         id = 'msg_current',
         role = 'assistant',
         sessionID = 'ses_1',
         mode = 'build',
-        time = {
-          created = 1,
-        },
-      },
-      parts = {},
-    }, {
-      info = {
-        id = 'msg_prev',
-        role = 'assistant',
-        sessionID = 'ses_1',
-        mode = 'plan',
       },
       parts = {},
     })
 
-    assert.are.same({ '----', '', '' }, output.lines)
-    assert.are.equal('BUILD', output.extmarks[1][1].virt_text[3][1])
+    assert.are.equal('ASSISTANT', output.extmarks[1][1].virt_text[3][1])
   end)
 
   it('anchors task child-session action to the rendered task block', function()

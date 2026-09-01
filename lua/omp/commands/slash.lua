@@ -12,7 +12,6 @@ local M = {}
 ---@type table<string, OmpSlashPreset>
 local slash_command_presets = {
   ['/help'] = { name = 'help' },
-  ['/agent'] = { name = 'agent', preset_args = { 'select' } },
   ['/command-list'] = { name = 'commands_list' },
   ['/compact'] = { name = 'session', preset_args = { 'compact' } },
   ['/history'] = { name = 'history' },
