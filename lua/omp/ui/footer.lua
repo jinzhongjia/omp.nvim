@@ -27,7 +27,7 @@ local function build_right_segments()
   if not loading_animation.is_running() and state.current_model and config.ui.display_model then
     table.insert(segments, { state.current_model, 'OmpHint' })
     if state.current_thinking_level then
-      table.insert(segments, { '·', 'OmpHint' })
+      table.insert(segments, { ' · ', 'OmpHint' })
       table.insert(segments, { state.current_thinking_level, 'OmpThinkingLevel' })
     end
     table.insert(segments, { ' ' })

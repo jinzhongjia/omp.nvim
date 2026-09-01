@@ -1,6 +1,7 @@
 local api_client = require('omp.api_client')
 local Promise = require('omp.promise')
 local Process = require('omp.rpc.process')
+local state = require('omp.state')
 
 local function fake_process_factory(states)
   local created = {}
@@ -243,6 +244,30 @@ describe('OMP API client', function()
 
     assert.is_true(waiter:wait(1000))
     assert.is_nil(client.prompt_sessions[prompt.id])
+    client:release_session(session.id):wait(1000)
+    restore()
+  end)
+
+  it('syncs the RPC thinking level into the active session UI state', function()
+    local created, restore = fake_process_factory({
+      {
+        sessionId = 'session-1',
+        sessionFile = '/tmp/project/session-1.jsonl',
+        thinkingLevel = 'high',
+        model = { provider = 'openai', id = 'gpt-test' },
+      },
+    })
+    local client = api_client.new('/tmp/project')
+    local session = client:create_session(false):wait(1000)
+    assert.equals('high', session.thinkingLevel)
+
+    state.session.set_active(session)
+    state.model.set_thinking_level(session.thinkingLevel)
+    created[1].listener({ type = 'thinking_level_changed', thinkingLevel = 'xhigh' })
+
+    assert.equals('xhigh', client.sessions[session.id].thinkingLevel)
+    assert.equals('xhigh', state.current_thinking_level)
+    state.session.clear_active()
     client:release_session(session.id):wait(1000)
     restore()
   end)

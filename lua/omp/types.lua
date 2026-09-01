@@ -120,6 +120,7 @@
 ---@field id string
 ---@field model { id: string, providerID: string }|nil
 ---@field directory? string
+---@field thinkingLevel? 'off'|'minimal'|'low'|'medium'|'high'|'xhigh'|'max'
 
 ---@class SessionProjectInfo
 ---@field id string

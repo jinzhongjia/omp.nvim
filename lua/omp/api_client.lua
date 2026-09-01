@@ -246,6 +246,16 @@ function OmpApiClient:_attach(process, adapter)
       self.available_commands = frame.commands or {}
       return
     end
+    if frame.type == 'thinking_level_changed' then
+      local session = self.sessions[adapter.session_id]
+      if session then
+        session.thinkingLevel = frame.thinkingLevel
+        local plugin_state = package.loaded['omp.state']
+        if plugin_state and plugin_state.active_session and plugin_state.active_session.id == session.id then
+          plugin_state.model.set_thinking_level(frame.thinkingLevel)
+        end
+      end
+    end
     for _, adapted in ipairs(adapter:handle(frame)) do
       self:_emit(adapted)
     end
@@ -331,6 +341,11 @@ function OmpApiClient:_session_from_state(data, fallback)
   session.sessionPath = data.sessionFile or session.sessionPath
   session.time = session.time or { created = timestamp, updated = timestamp }
   session.model = data.model and { id = data.model.id, providerID = data.model.provider } or session.model
+  session.thinkingLevel = data.thinkingLevel
+  local plugin_state = package.loaded['omp.state']
+  if plugin_state and plugin_state.active_session and plugin_state.active_session.id == id then
+    plugin_state.model.set_thinking_level(session.thinkingLevel)
+  end
   self.sessions[id] = session
   return session
 end
@@ -493,11 +508,16 @@ function OmpApiClient:release_session(id)
 end
 
 function OmpApiClient:get_session(id)
-  local session = self.sessions[id] or find_session(id, self.cwd)
-  if session then
-    self.sessions[id] = session
-  end
-  return Promise.new():resolve(session)
+  return Promise.async(function()
+    local existing = self.sessions[id] or find_session(id, self.cwd)
+    if not existing then
+      return nil
+    end
+    self.sessions[id] = existing
+    local process = self:_ensure_session_process(id):await()
+    local data = process:request({ type = 'get_state' }):await()
+    return self:_session_from_state(data, existing)
+  end)()
 end
 
 function OmpApiClient:update_session(id, update)

@@ -335,6 +335,38 @@ describe('omp.services.session_runtime', function()
       input_window._show:revert()
       state.ui.is_visible = orig_is_visible
     end)
+
+    it('publishes model and thinking level as one coherent state', function()
+      state.model.set_model('openai/old')
+      state.model.set_thinking_level(nil)
+      local original_get_session = state.api_client.get_session
+      state.api_client.get_session = function(_, id)
+        return Promise.new():resolve({
+          id = id,
+          title = 'Session',
+          model = { providerID = 'openai-codex', id = 'gpt-5.6-sol' },
+          thinkingLevel = 'high',
+        })
+      end
+
+      local observed
+      local listener = function()
+        observed = {
+          model = state.current_model,
+          thinking_level = state.current_thinking_level,
+        }
+      end
+      state.store.subscribe('current_model', listener)
+
+      session_runtime.switch_session('session-with-thinking'):wait()
+
+      state.store.unsubscribe('current_model', listener)
+      state.api_client.get_session = original_get_session
+      assert.same({
+        model = 'openai-codex/gpt-5.6-sol',
+        thinking_level = 'high',
+      }, observed)
+    end)
   end)
 
   describe('cancel', function()

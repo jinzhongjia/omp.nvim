@@ -9,7 +9,6 @@ local config = require('omp.config')
 local image_handler = require('omp.image_handler')
 local Promise = require('omp.promise')
 local log = require('omp.log')
-local agent_model = require('omp.services.agent_model')
 
 local M = {}
 
@@ -64,6 +63,22 @@ local function focus_after_session_switch(selected_session)
   end
   ui.focus_input()
 end
+local activate_session = Promise.async(function(session_info)
+  if session_info and state.api_client then
+    session_info = state.api_client:get_session(session_info.id):await() or session_info
+  end
+
+  local model = session_info and session_info.model
+  local model_name = model and model.providerID and model.id and (model.providerID .. '/' .. model.id) or nil
+  state.store.batch(function()
+    state.session.set_active(session_info)
+    if model_name then
+      state.model.set_model(model_name)
+    end
+    state.model.set_thinking_level(session_info and session_info.thinkingLevel or nil)
+  end)
+  return session_info
+end)
 
 ---@param scope? 'project' | 'global'
 M.select_session = Promise.async(function(scope)
@@ -93,10 +108,7 @@ end)
 
 M.switch_session = Promise.async(function(session_id)
   local selected_session = session.get_by_id(session_id):await()
-
-  state.model.clear()
-  agent_model.initialize_current_model():await()
-  state.session.set_active(selected_session)
+  selected_session = activate_session(selected_session):await()
   focus_after_session_switch(selected_session)
 end)
 
@@ -186,16 +198,12 @@ M.open = Promise.async(function(opts)
     if opts.new_session then
       state.session.clear_active()
       context.unload_attachments()
-      agent_model.initialize_current_model():await()
-      state.session.set_active(M.create_new_session():await())
+      activate_session(M.create_new_session():await()):await()
       log.debug('Created new session on open', { session = state.active_session.id })
     else
-      agent_model.initialize_current_model():await()
       if not state.active_session then
-        state.session.set_active(session.get_last_workspace_session():await())
-        if not state.active_session then
-          state.session.set_active(M.create_new_session():await())
-        end
+        local last_session = session.get_last_workspace_session():await()
+        activate_session(last_session or M.create_new_session():await()):await()
       elseif not state.display_route and are_windows_closed and not restoring_hidden then
         ui.render_output()
       end
@@ -365,7 +373,7 @@ M.handle_directory_change = Promise.async(function()
   state.session.clear_active()
   context.unload_attachments()
 
-  state.session.set_active(session.get_last_workspace_session():await() or M.create_new_session():await())
+  activate_session(session.get_last_workspace_session():await() or M.create_new_session():await()):await()
 
   log.debug('Loaded session for new working dir ' .. vim.inspect({ session = state.active_session }))
 end)

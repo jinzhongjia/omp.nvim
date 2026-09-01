@@ -17,7 +17,15 @@ function M.configure_provider()
     end
 
     local model = string.format('%s/%s', selection.provider, selection.model)
-    state.model.set_model(model)
+    local model_info = config_file.get_model_info(selection.provider, selection.model)
+    local thinking_level = model_info
+        and model_info.reasoning
+        and require('omp.model_state').get_thinking_level(selection.provider, selection.model)
+      or nil
+    state.store.batch(function()
+      state.model.set_model(model)
+      state.model.set_thinking_level(thinking_level)
+    end)
     if state.ui.is_visible() then
       ui.focus_input()
     else
