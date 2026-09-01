@@ -97,6 +97,14 @@ describe('omp RPC process', function()
     process:shutdown():wait(1000)
   end)
 
+  it('loads the native title extension for persisted sessions', function()
+    local command = Process.new({ cwd = '/tmp/project' }):_command()
+
+    assert.same({ 'omp', '--mode', 'rpc', '--cwd', '/tmp/project', '--extension' }, vim.list_slice(command, 1, 6))
+    assert.matches('lua/omp/rpc/title%.ts$', command[7])
+    assert.equals(1, vim.fn.filereadable(command[7]))
+  end)
+
   it('reassembles v2 rpc_chunk frames before dispatch', function()
     local process = Process.new({ cwd = '/tmp/project', no_session = true })
     process:start():wait(1000)

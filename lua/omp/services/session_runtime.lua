@@ -43,12 +43,12 @@ function M.list_sessions_by_scope(scope)
   return session.get_all_workspace_sessions():await() or {}
 end
 
----Keep only sessions with a non-empty title.
+---Keep sessions with a valid ID; empty OMP titles use a display fallback.
 ---@param sessions Session[]|GlobalSession[]
 ---@return Session[]
 function M.filter_pickable_sessions(sessions)
   return vim.tbl_filter(function(s)
-    return s ~= nil and s.title ~= ''
+    return s ~= nil and s.id ~= nil and s.id ~= ''
   end, sessions)
 end
 

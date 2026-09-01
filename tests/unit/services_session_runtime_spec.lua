@@ -286,7 +286,7 @@ describe('omp.services.session_runtime', function()
   end)
 
   describe('select_session', function()
-    it('filters sessions by non-empty title', function()
+    it('keeps sessions with empty titles selectable', function()
       local mock_sessions = {
         { id = 'session1', title = 'First session', modified = 1, parentID = nil },
         { id = 'session2', title = '', modified = 2, parentID = nil },
@@ -300,15 +300,15 @@ describe('omp.services.session_runtime', function()
       local passed
       stub(ui, 'select_session').invokes(function(sessions, cb)
         passed = sessions
-        cb(sessions[2])
+        cb(sessions[3])
       end)
       ui.render_output:revert()
       stub(ui, 'render_output')
 
       state.ui.set_windows({ input_buf = 1, output_buf = 2 })
       session_runtime.select_session(nil):wait()
-      assert.equal(2, #passed)
-      assert.equal('session3', passed[2].id)
+      assert.equal(3, #passed)
+      assert.equal('session2', passed[2].id)
       assert.truthy(state.active_session)
       assert.equal('session3', state.active_session.id)
     end)
@@ -794,12 +794,6 @@ describe('omp.services.session_runtime', function()
 
       config.lock_session_to_directory = original
       state.session.set_locked(nil)
-    end)
-  end)
-
-  describe('switch_to_mode', function()
-    it('delegates model/mode switch coverage to services_agent_model_spec', function()
-      assert.is_true(true)
     end)
   end)
 

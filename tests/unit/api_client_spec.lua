@@ -271,4 +271,167 @@ describe('OMP API client', function()
     client:release_session(session.id):wait(1000)
     restore()
   end)
+
+  it('leaves first-prompt title generation to OMP', function()
+    local created, restore = fake_process_factory({
+      {
+        sessionId = 'session-1',
+        sessionFile = '/tmp/project/session-1.jsonl',
+        model = { provider = 'openai', id = 'gpt-test' },
+      },
+    })
+    local client = api_client.new('/tmp/project')
+    local session = client:create_session(false):wait(1000)
+
+    client
+      :create_message(session.id, {
+        parts = {
+          { type = 'text', text = 'context', synthetic = true },
+          { type = 'text', text = 'Fix this' .. string.char(10) .. 'now' },
+        },
+      })
+      :wait(1000)
+
+    local prompt_requests = {}
+    for _, request in ipairs(created[1].requests) do
+      if request.type == 'prompt' then
+        table.insert(prompt_requests, request)
+      end
+      assert.is_not_equal('set_session_name', request.type)
+    end
+    assert.equals(1, #prompt_requests)
+    local expected = '<context>' .. string.char(10) .. 'context' .. string.char(10) .. '</context>'
+      .. string.char(10, 10)
+      .. 'Fix this'
+      .. string.char(10)
+      .. 'now'
+    assert.equals(expected, prompt_requests[1].message)
+    assert.equals('New session', client.sessions[session.id].title)
+    client:release_session(session.id):wait(1000)
+    restore()
+  end)
+
+  it('keeps persisted sessions with an empty OMP title visible', function()
+    local original_home = vim.uv.os_homedir
+    local home = vim.fn.tempname()
+    local cwd = home .. '/project'
+    local session_dir = home .. '/.omp/agent/sessions/-project'
+    vim.fn.mkdir(cwd, 'p')
+    vim.fn.mkdir(session_dir, 'p')
+    vim.fn.writefile({
+      vim.json.encode({ type = 'title', title = '' }),
+      vim.json.encode({
+        type = 'session',
+        id = 'empty-title-session',
+        timestamp = '2026-09-01T12:00:00.000Z',
+        cwd = cwd,
+      }),
+    }, session_dir .. '/session.jsonl')
+    vim.uv.os_homedir = function()
+      return home
+    end
+
+    local sessions = api_client.new(cwd):list_sessions():wait(1000)
+
+    vim.uv.os_homedir = original_home
+    vim.fn.delete(home, 'rf')
+    assert.equals(1, #sessions)
+    assert.equals('empty-title-session', sessions[1].id)
+    assert.equals('New session', sessions[1].title)
+  end)
+
+  it('refreshes a cached New session title from OMP persistence', function()
+    local original_home = vim.uv.os_homedir
+    local home = vim.fn.tempname()
+    local cwd = home .. '/project'
+    local session_dir = home .. '/.omp/agent/sessions/-project'
+    vim.fn.mkdir(cwd, 'p')
+    vim.fn.mkdir(session_dir, 'p')
+    vim.fn.writefile({
+      vim.json.encode({ type = 'title', title = 'Generated title' }),
+      vim.json.encode({
+        type = 'session',
+        id = 'generated-title-session',
+        timestamp = '2026-09-01T12:00:00.000Z',
+        cwd = cwd,
+      }),
+    }, session_dir .. '/session.jsonl')
+    vim.uv.os_homedir = function()
+      return home
+    end
+    local client = api_client.new(cwd)
+    local live = {
+      id = 'generated-title-session',
+      title = 'New session',
+      directory = cwd,
+      workspace = cwd,
+      time = { created = 0, updated = 0 },
+    }
+    client.sessions[live.id] = live
+
+    local sessions = client:list_sessions():wait(1000)
+
+    vim.uv.os_homedir = original_home
+    vim.fn.delete(home, 'rf')
+    assert.equals(1, #sessions)
+    assert.equals('Generated title', sessions[1].title)
+    assert.equals('Generated title', live.title)
+  end)
+
+  it('publishes an asynchronous native title update into the live session', function()
+    local original_defer = vim.defer_fn
+    local home = vim.fn.tempname()
+    local cwd = home .. '/project'
+    local session_path = home .. '/session.jsonl'
+    vim.fn.mkdir(cwd, 'p')
+    vim.fn.writefile({
+      vim.json.encode({ type = 'title', title = '' }),
+      vim.json.encode({
+        type = 'session',
+        id = 'async-title-session',
+        timestamp = '2026-09-01T12:00:00.000Z',
+        cwd = cwd,
+      }),
+    }, session_path)
+    local deferred
+    vim.defer_fn = function(callback, timeout)
+      assert.equals(250, timeout)
+      deferred = callback
+    end
+    local client = api_client.new(cwd)
+    local live = {
+      id = 'async-title-session',
+      title = 'New session',
+      directory = cwd,
+      workspace = cwd,
+      sessionPath = session_path,
+      time = { created = 0, updated = 0 },
+    }
+    client.sessions[live.id] = live
+    client.processes[live.id] = {}
+    local updated
+    table.insert(client.listeners, function(event)
+      if event.type == 'session.updated' then
+        updated = event.properties.info
+      end
+    end)
+
+    client:_poll_session_title(live.id)
+    vim.fn.writefile({
+      vim.json.encode({ type = 'title', title = 'Generated asynchronously' }),
+      vim.json.encode({
+        type = 'session',
+        id = live.id,
+        timestamp = '2026-09-01T12:00:00.000Z',
+        cwd = cwd,
+      }),
+    }, session_path)
+    deferred()
+
+    vim.defer_fn = original_defer
+    vim.fn.delete(home, 'rf')
+    assert.equals('Generated asynchronously', live.title)
+    assert.equals(live, updated)
+    assert.is_nil(client.title_poll_tokens[live.id])
+  end)
 end)

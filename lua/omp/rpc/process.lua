@@ -1,6 +1,8 @@
 local Promise = require('omp.promise')
 local log = require('omp.log')
 
+local title_extension = vim.fs.joinpath(vim.fs.dirname(debug.getinfo(1, 'S').source:sub(2)), 'title.ts')
+
 ---@class OmpRpcProcessOpts
 ---@field cwd string
 ---@field executable? string
@@ -71,6 +73,9 @@ function Process:_command()
     vim.list_extend(command, { '--resume', self.resume })
   elseif self.no_session then
     table.insert(command, '--no-session')
+  end
+  if not self.no_session then
+    vim.list_extend(command, { '--extension', title_extension })
   end
   vim.list_extend(command, self.extra_args)
   return command

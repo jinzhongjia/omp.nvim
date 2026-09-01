@@ -16,6 +16,8 @@ local log = require('omp.log')
 ---@field run_promises table<string, Promise<boolean>>
 ---@field prompt_sessions table<string, string>
 ---@field next_prompt_id integer
+---@field title_poll_tokens table<string, integer>
+---@field next_title_poll_token integer
 ---@field spawn_promise Promise<OmpApiClient>
 ---@field shutdown_promise Promise<boolean>
 ---@field url string
@@ -59,7 +61,7 @@ local function read_session(path)
   for _, line in ipairs(lines) do
     local decoded_ok, entry = pcall(vim.json.decode, line)
     if decoded_ok and type(entry) == 'table' then
-      if (entry.type == 'title' or entry.type == 'title_change') and entry.title then
+      if (entry.type == 'title' or entry.type == 'title_change') and entry.title and entry.title ~= '' then
         title = entry.title
       elseif entry.type == 'session' then
         header = entry
@@ -78,7 +80,7 @@ local function read_session(path)
     or updated
   return {
     id = header.id,
-    title = title or header.title or vim.fs.basename(path),
+    title = title or (header.title ~= '' and header.title) or 'New session',
     directory = header.cwd,
     workspace = header.cwd,
     parentID = nil,
@@ -204,6 +206,8 @@ function OmpApiClient.new(cwd)
     run_promises = {},
     prompt_sessions = {},
     next_prompt_id = 0,
+    title_poll_tokens = {},
+    next_title_poll_token = 0,
     spawn_promise = Promise.new(),
     shutdown_promise = Promise.new(),
     url = 'stdio://omp',
@@ -296,6 +300,7 @@ function OmpApiClient:shutdown()
   if self.shutdown_promise:is_resolved() then
     return self.shutdown_promise
   end
+  self.title_poll_tokens = {}
   local remaining = 0
   local function stopped()
     remaining = remaining - 1
@@ -348,6 +353,40 @@ function OmpApiClient:_session_from_state(data, fallback)
   end
   self.sessions[id] = session
   return session
+end
+
+function OmpApiClient:_poll_session_title(id)
+  local session = self.sessions[id]
+  if not session or (session.title and session.title ~= '' and session.title ~= 'New session') then
+    return
+  end
+  self.next_title_poll_token = self.next_title_poll_token + 1
+  local token = self.next_title_poll_token
+  self.title_poll_tokens[id] = token
+
+  local function poll(attempt)
+    if self.title_poll_tokens[id] ~= token then
+      return
+    end
+    local live = self.sessions[id]
+    local persisted = live and live.sessionPath and read_session(live.sessionPath)
+    if persisted and persisted.title ~= 'New session' then
+      live.title = persisted.title
+      live.time = persisted.time
+      self.title_poll_tokens[id] = nil
+      self:_emit({ type = 'session.updated', properties = { info = live } })
+      return
+    end
+    if attempt >= 120 or not self.processes[id] then
+      self.title_poll_tokens[id] = nil
+      return
+    end
+    vim.defer_fn(function()
+      poll(attempt + 1)
+    end, 250)
+  end
+
+  poll(0)
 end
 
 ---@param existing? Session
@@ -438,7 +477,10 @@ function OmpApiClient:list_sessions()
       local found = false
       for index, session in ipairs(sessions) do
         if session.id == id then
-          sessions[index] = vim.tbl_extend('force', session, live)
+          for key, value in pairs(session) do
+            live[key] = value
+          end
+          sessions[index] = live
           found = true
           break
         end
@@ -493,6 +535,7 @@ function OmpApiClient:release_session(id)
   local process = self.processes[id]
   self.processes[id] = nil
   self.sessions[id] = nil
+  self.title_poll_tokens[id] = nil
   self.busy[id] = nil
   self.run_promises[id] = nil
   for prompt_id, session_id in pairs(self.prompt_sessions) do
@@ -574,6 +617,9 @@ function OmpApiClient:create_message(id, params)
         streamingBehavior = behavior,
       })
       :await()
+    if not response or response.agentInvoked ~= false then
+      self:_poll_session_title(id)
+    end
     if response and response.agentInvoked == false then
       run_promise:resolve(true)
       self.prompt_sessions[prompt_id] = nil
