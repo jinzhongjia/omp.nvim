@@ -25,11 +25,6 @@ function M.belongs_to_session(request, session_id)
     if request.sessionID == session_id then
       return true
     end
-
-    local render_state = require('omp.ui.renderer.ctx').render_state
-    if render_state:get_task_part_by_child_session(request.sessionID) ~= nil then
-      return true
-    end
   end
 
   local message_id = get_message_id(request)

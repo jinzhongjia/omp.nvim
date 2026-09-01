@@ -16,16 +16,13 @@ local slash_command_presets = {
   ['/compact'] = { name = 'session', preset_args = { 'compact' } },
   ['/history'] = { name = 'history' },
   ['/models'] = { name = 'models' },
-  ['/variant'] = { name = 'variant' },
+  ['/thinking-level'] = { name = 'thinking_level' },
   ['/new'] = { name = 'session', preset_args = { 'new' } },
   ['/sessions'] = { name = 'session', preset_args = { 'select' } },
   ['/skills'] = { name = 'skills' },
   ['/clear_selections'] = { name = 'clear_selections' },
   ['/clear_files'] = { name = 'clear_files' },
   ['/rename'] = { name = 'session', preset_args = { 'rename' } },
-  ['/thinking'] = { name = 'toggle_reasoning_output' },
-  ['/reasoning'] = { name = 'toggle_reasoning_output' },
-  ['/review'] = { name = 'review' },
 }
 
 ---@param preset OmpSlashPreset
@@ -109,50 +106,32 @@ end
 M.get_commands = Promise.async(function()
   ---@type OmpSlashCommand[]
   local result = {}
+  local seen = {}
 
   for slash_cmd, def in pairs(M.get_builtin_command_definitions()) do
     local runtime_def = to_runtime_slash_command(slash_cmd, def)
     if runtime_def then
       table.insert(result, runtime_def)
+      seen[slash_cmd] = true
     end
   end
 
-  local user_commands = config_file.get_user_commands():await()
-  if user_commands then
-    for name, def in pairs(user_commands) do
-      table.insert(result, {
-        slash_cmd = '/' .. name,
-        desc = def.description or 'User command',
-        fn = function(args)
-          local cmd_args = vim.list_extend({ name }, args or {})
-          return dispatch_parsed('command', cmd_args)
-        end,
-        args = true,
-      })
-    end
-  end
-
-  local state = require('omp.state')
-  local ok, skills = pcall(function()
-    return state.api_client:list_skills():await()
-  end)
-  if ok and skills then
-    for _, skill in ipairs(skills) do
-      local skill_content = skill.content
-      table.insert(result, {
-        slash_cmd = '/' .. skill.name,
-        desc = skill.description or 'Skill',
-        fn = function(args)
-          local message = skill_content
-          if args and #args > 0 then
-            message = skill_content .. '\n\n' .. table.concat(args, ' ')
-          end
-          require('omp.services.session_runtime').open({ new_session = false, focus = 'output' }):and_then(function()
-            return require('omp.services.messaging').send_message(message, {})
-          end)
-        end,
-        args = true,
-      })
+  local backend_commands = config_file.get_user_commands():await()
+  if backend_commands then
+    for name, def in pairs(backend_commands) do
+      local slash_cmd = '/' .. name
+      if not seen[slash_cmd] then
+        table.insert(result, {
+          slash_cmd = slash_cmd,
+          desc = def.description or 'OMP command',
+          fn = function(args)
+            local cmd_args = vim.list_extend({ name }, args or {})
+            return dispatch_parsed('command', cmd_args)
+          end,
+          args = true,
+        })
+        seen[slash_cmd] = true
+      end
     end
   end
 

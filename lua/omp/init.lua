@@ -11,15 +11,15 @@ end
 
 local function on_current_model_change(_key, new_val, old_val)
   if new_val ~= old_val then
-    state.model.clear_variant()
+    state.model.clear_thinking_level()
 
     if new_val then
       local provider, model = new_val:match('^(.-)/(.+)$')
       if provider and model then
         local model_state = require('omp.model_state')
-        local saved_variant = model_state.get_variant(provider, model)
+        local saved_variant = model_state.get_thinking_level(provider, model)
         if saved_variant then
-          state.model.set_variant(saved_variant)
+          state.model.set_thinking_level(saved_variant)
         end
       end
     end
@@ -32,10 +32,7 @@ function M.setup(opts)
   end
   setup_done = true
 
-  -- Have to setup config first, especially before state as
-  -- it initializes at least one value (current_mode) from config.
-  -- If state is require'd first then it will not get what may
-  -- be set by the user
+  -- Configuration must be initialized before state-backed modules.
   local config = require('omp.config')
   config.setup(opts)
 

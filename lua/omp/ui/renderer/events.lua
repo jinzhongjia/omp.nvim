@@ -348,15 +348,7 @@ function M.on_part_updated(properties, revert_index)
     return
   end
 
-  -- Child-session parts: update the task-tool display instead
   if state.active_session.id ~= part.sessionID then
-    if part.tool or part.type == 'tool' then
-      ctx.render_state:upsert_child_session_part(part.sessionID, part)
-      local task_part_id = ctx.render_state:get_task_part_by_child_session(part.sessionID)
-      if task_part_id then
-        flush.mark_part_dirty(task_part_id)
-      end
-    end
     return
   end
 

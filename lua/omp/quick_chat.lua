@@ -67,11 +67,7 @@ local function cancel_all_quick_chat_sessions()
       session_info.spinner:stop()
     end
 
-    if config.debug.quick_chat and not config.debug.quick_chat.keep_session then
-      state.api_client:delete_session(session_id):catch(function(err)
-        vim.notify('Error deleting quickchat session: ' .. vim.inspect(err), vim.log.levels.WARN)
-      end)
-    end
+    state.api_client:release_session(session_id)
 
     running_sessions[session_id] = nil
   end
@@ -109,11 +105,7 @@ local function cleanup_session(session_info, session_id, message)
     session_info.spinner:stop()
   end
 
-  if config.debug.quick_chat and not config.debug.quick_chat.keep_session then
-    state.api_client:delete_session(session_id):catch(function(err)
-      vim.notify('Error deleting quickchat session: ' .. vim.inspect(err), vim.log.levels.WARN)
-    end)
-  end
+  state.api_client:release_session(session_id)
 
   running_sessions[session_id] = nil
 
@@ -332,17 +324,12 @@ local create_message = Promise.async(function(message, buf, range, context_confi
     end
   end
 
-  local target_agent = options.agent or quick_chat_config.default_agent or state.current_mode or config.default_mode
-  if target_agent then
-    params.agent = target_agent
-  end
-
   return params
 end)
 
 --- Unified quick chat function
 ---@param message string Optional custom message to use instead of default prompts
----@param options {context_config?:OmpContextConfig, model?: string, agent?: string}|nil Optional configuration for context and behavior
+---@param options {context_config?:OmpContextConfig, model?: string}|nil Optional configuration for context and behavior
 ---@param range table|nil Optional range information { start = number, stop = number }
 ---@return Promise
 M.quick_chat = Promise.async(function(message, options, range)
@@ -369,7 +356,7 @@ M.quick_chat = Promise.async(function(message, options, range)
   end
 
   local title = create_session_title(buf)
-  local quick_chat_session = session_runtime.create_new_session(title):await()
+  local quick_chat_session = state.api_client:create_ephemeral_session(title):await()
   if not quick_chat_session then
     spinner:stop()
     return Promise.new():reject('Failed to create quickchat session')
@@ -396,12 +383,14 @@ M.quick_chat = Promise.async(function(message, options, range)
 
   local success, err = pcall(function()
     state.api_client:create_message(quick_chat_session.id, params):await()
+    state.api_client:wait_for_idle(quick_chat_session.id):await()
     on_done(quick_chat_session):await()
   end)
 
   if not success then
     spinner:stop()
     running_sessions[quick_chat_session.id] = nil
+    state.api_client:release_session(quick_chat_session.id)
     vim.notify('Error in quick chat: ' .. vim.inspect(err), vim.log.levels.ERROR)
   end
 end)

@@ -366,35 +366,6 @@ describe('renderer unit tests', function()
     assert.stub(clear_targets_stub).was_not_called()
   end)
 
-  it('inserts a single synthetic revert message during full session render', function()
-    local renderer = require('omp.ui.renderer')
-
-    helpers.replay_setup()
-
-    state.session.set_active({
-      id = 'ses_123',
-      title = 'Session',
-      time = { created = 1, updated = 1 },
-      revert = { messageID = 'msg_1', snapshot = 'a', diff = '' },
-    })
-
-    renderer._render_full_session_data({
-      {
-        info = {
-          id = 'msg_1',
-          role = 'assistant',
-          sessionID = 'ses_123',
-        },
-        parts = {},
-      },
-    })
-
-    local revert_messages = vim.tbl_filter(function(message)
-      return message.info and message.info.id == '__omp_revert_message__'
-    end, state.messages or {})
-
-    assert.are.equal(1, #revert_messages)
-  end)
 
   it('supports output target navigation from a replayed assistant file reference', function()
     local renderer = require('omp.ui.renderer')

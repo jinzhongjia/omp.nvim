@@ -70,13 +70,10 @@ function M.actions.open_input_new_session_with_title(title)
   end)(title)
 end
 
----@param parent_id? string
 ---@param scope? 'project' | 'global' defaults to global when session is locked, project otherwise
-function M.actions.select_session(parent_id, scope)
-  if scope == nil then
-    scope = session_runtime.is_session_locked() and 'global' or 'project'
-  end
-  session_runtime.select_session(parent_id, scope)
+function M.actions.select_session(scope)
+  scope = scope or (session_runtime.is_session_locked() and 'global' or 'project')
+  session_runtime.select_session(scope)
 end
 
 ---@param value? boolean if nil toggle, otherwise set to value

@@ -11,7 +11,6 @@ local input_window = require('omp.ui.input_window')
 local ui = require('omp.ui.ui')
 local nvim = vim['api']
 local session_runtime = require('omp.services.session_runtime')
-local agent_model = require('omp.services.agent_model')
 
 local M = {
   actions = {},
@@ -267,16 +266,6 @@ M.actions.run_user_command = Promise.async(function(name, args)
       return
     end
 
-    local model = command_cfg.model or state.current_model
-    local agent = command_cfg.agent or state.current_mode
-
-    if command_cfg.agent then
-      local available_agents = config_file.get_omp_agents():await()
-      if vim.tbl_contains(available_agents, agent) then
-        agent_model.switch_to_mode(agent)
-      end
-    end
-
     local active_session = get_active_session_or_warn('No active session')
     if not active_session then
       return
@@ -286,8 +275,6 @@ M.actions.run_user_command = Promise.async(function(name, args)
       :send_command(active_session.id, {
         command = name,
         arguments = join_args(args),
-        model = model,
-        agent = agent,
       })
       :and_then(function()
         schedule_slash_history(name, args)

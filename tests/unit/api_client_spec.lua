@@ -71,7 +71,7 @@ describe('OMP API client', function()
     assert.equals(2, #result.providers)
     assert.equals('anthropic', result.providers[1].id)
     assert.equals('Claude Test', result.providers[1].models['claude-test'].name)
-    assert.same({ low = {}, medium = {}, high = {} }, result.providers[1].models['claude-test'].variants)
+    assert.is_true(result.providers[1].models['claude-test'].reasoning)
   end)
 
   it('routes extension UI question answers back to the owning process', function()
@@ -181,6 +181,69 @@ describe('OMP API client', function()
       assert.equals(1, process.shutdown_count)
       assert.is_false(process.running)
     end
+    restore()
+  end)
+
+  it('uses a no-session process for ephemeral sessions and releases it', function()
+    local created, restore = fake_process_factory({
+      {
+        sessionId = 'quick-1',
+        model = { provider = 'openai', id = 'gpt-test' },
+      },
+    })
+    local client = api_client.new('/tmp/project')
+
+    local session = client:create_ephemeral_session('Quick chat'):wait(1000)
+    assert.is_true(session.ephemeral)
+    assert.is_true(created[1].opts.no_session)
+    assert.is_nil(created[1].opts.resume)
+
+    client:release_session(session.id):wait(1000)
+    assert.is_nil(client.processes[session.id])
+    assert.equals(1, created[1].shutdown_count)
+    restore()
+  end)
+
+  it('resolves a run waiter only when that session becomes idle', function()
+    local created, restore = fake_process_factory({
+      {
+        sessionId = 'session-1',
+        sessionFile = '/tmp/project/session-1.jsonl',
+        model = { provider = 'openai', id = 'gpt-test' },
+      },
+    })
+    local client = api_client.new('/tmp/project')
+    local session = client:create_session(false):wait(1000)
+
+    client:create_message(session.id, { parts = { { type = 'text', text = 'hello' } } }):wait(1000)
+    local waiter = client:wait_for_idle(session.id)
+    assert.is_false(waiter:is_resolved())
+
+    client:_emit({ type = 'session.idle', properties = { sessionID = session.id } })
+    assert.is_true(waiter:wait(1000))
+    client:release_session(session.id):wait(1000)
+    restore()
+  end)
+
+  it('resolves local-only prompts from prompt_result frames', function()
+    local created, restore = fake_process_factory({
+      {
+        sessionId = 'quick-1',
+        model = { provider = 'openai', id = 'gpt-test' },
+      },
+    })
+    local client = api_client.new('/tmp/project')
+    local session = client:create_ephemeral_session('Quick chat'):wait(1000)
+    client:create_message(session.id, { parts = { { type = 'text', text = '/help' } } }):wait(1000)
+
+    local prompt = created[1].requests[#created[1].requests]
+    local waiter = client:wait_for_idle(session.id)
+    assert.is_false(waiter:is_resolved())
+    created[1].listener({ type = 'prompt_result', id = prompt.id, agentInvoked = false })
+
+    assert.is_true(waiter:wait(1000))
+    assert.is_nil(client.prompt_sessions[prompt.id])
+    client:release_session(session.id):wait(1000)
     restore()
   end)
 end)

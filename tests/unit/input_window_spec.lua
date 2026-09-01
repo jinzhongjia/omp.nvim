@@ -549,47 +549,6 @@ describe('input_window', function()
     end)
   end)
 
-  describe('child session input visibility', function()
-    after_each(function()
-      state.session.clear_active()
-    end)
-
-    it('_show() is a no-op when active session is a child session', function()
-      state.session.set_active({ id = 'child1', parentID = 'parent1' })
-      input_window._hidden = true
-
-      input_window._show()
-
-      assert.is_true(input_window._hidden)
-    end)
-
-    it('_show() proceeds when active session is a root session', function()
-      state.session.set_active({ id = 'root1' })
-      input_window._hidden = true
-
-      -- _show will early-return due to missing windows, but it should pass the guard
-      input_window._show()
-
-      -- _hidden remains true because windows are nil, but the parentID guard was passed
-      assert.is_true(input_window._hidden)
-    end)
-
-    it('_show() proceeds for child session when child_readonly is false', function()
-      state.session.set_active({ id = 'child1', parentID = 'parent1' })
-      local config = require('omp.config')
-      local orig_readonly = config.values.child_readonly
-      config.values.child_readonly = false
-      input_window._hidden = true
-
-      -- _show will early-return due to missing windows, but it should pass the guard
-      input_window._show()
-
-      -- _hidden remains true because windows are nil, but the parentID guard was passed
-      assert.is_true(input_window._hidden)
-      config.values.child_readonly = orig_readonly
-    end)
-  end)
-
   local function make_message(parts)
     return {
       info = { id = 'msg_1', sessionID = 'ses_1', role = 'user' },

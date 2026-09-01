@@ -14,7 +14,6 @@
 ---@field theme string
 ---@field autoupdate boolean
 ---@field model string
----@field agent table<string, table>
 ---@field command table<string, table>
 ---@field plugin table[]
 ---@field username string
@@ -119,9 +118,7 @@
 ---@field title string
 ---@field time { created: number, updated: number }
 ---@field id string
----@field parentID string|nil
----@field agent string|nil
----@field model { id: string, providerID: string, variant?: string }|nil
+---@field model { id: string, providerID: string }|nil
 ---@field directory? string
 
 ---@class SessionProjectInfo
@@ -336,7 +333,6 @@
 
 ---@class OmpQuickChatConfig
 ---@field default_model? string -- Use current model if nil
----@field default_agent? string -- Use current mode if nil
 ---@field instructions? string[] -- Custom instructions for quick chat
 
 ---@class OmpLoggingConfig
@@ -355,7 +351,6 @@
 ---@class OmpConfig
 ---@field preferred_picker 'telescope' | 'telescope.nvim' | 'fzf' | 'fzf-lua' | 'mini.pick' | 'snacks' | 'snacks.nvim' | 'select' | nil
 ---@field default_global_keymaps boolean
----@field default_mode string -- UI label; defaults to "default"
 ---@field default_system_prompt string | nil
 ---@field keymap_prefix string
 ---@field omp_executable 'omp' | string -- Command run for calling omp
@@ -367,7 +362,6 @@
 ---@field logging OmpLoggingConfig
 ---@field debug OmpDebugConfig
 ---@field prompt_guard? fun(mentioned_files: string[]): boolean
----@field child_readonly boolean
 ---@field hooks OmpHooks
 ---@field quick_chat OmpQuickChatConfig
 
@@ -405,7 +399,6 @@
 
 ---@class TaskToolMetadata: ToolMetadataBase
 ---@field summary TaskToolSummaryItem[]
----@field sessionId string|nil Child session ID
 
 ---@class WebFetchToolMetadata: ToolMetadataBase
 ---@field http_status number|nil HTTP response status code
@@ -508,8 +501,7 @@
 ---@field msg_idx number|nil Message index in session
 ---@field part_idx number|nil Part index in message
 ---@field role 'user'|'assistant'|'system'|nil Message role
----@field type 'text'|'tool'|'header'|'patch'|'step-start'|nil Message part type
----@field snapshot? string|nil snapshot commit hash
+---@field type 'text'|'tool'|'header'|nil Message part type
 
 ---@class OutputAction
 ---@field text string Action text
@@ -582,7 +574,6 @@
 ---@field providerID string Provider identifier
 ---@field role 'user'|'assistant'|'system' Role of the message sender
 ---@field system_role string|nil Role defined in system messages
----@field mode string|nil Agent or mode identifier
 ---@field error table
 
 ---@class OpenOpts
@@ -595,8 +586,7 @@
 ---@field new_session? boolean
 ---@field context? OmpContextConfig
 ---@field model? string
----@field agent? string
----@field variant? string
+---@field thinking_level? 'off'|'minimal'|'low'|'medium'|'high'|'xhigh'|'max'
 ---@field system? string
 
 ---@class CompletionContext
@@ -700,9 +690,6 @@
 ---@field context number Maximum context length in tokens
 ---@field output number Maximum output length in tokens
 
----@class OmpModelVariant
----@field reasoningEffort string Reasoning effort level (e.g., "low", "medium", "high")
-
 ---@class OmpModel
 ---@field id string Unique identifier for the model
 ---@field name string Human-readable name of the model
@@ -717,7 +704,6 @@
 ---@field open_weights boolean Whether the model has open weights
 ---@field limit OmpModelLimits Token limits for the model
 ---@field cost OmpModelCost Pricing information for the model
----@field variants table<string, OmpModelVariant>|nil Model variants with different configurations
 
 ---@class OmpProvider
 ---@field id string Unique identifier for the provider
@@ -768,11 +754,6 @@
 ---@field desc string|nil Description of the command
 ---@field fn fun(args:string[]|nil):nil|Promise<any>|any Function to execute the command
 ---@field args boolean Whether the command accepts arguments
-
----@class OmpRevertSummary
----@field messages number Number of messages reverted
----@field tool_calls number Number of tool calls reverted
----@field files table<string, {additions: number, deletions: number}> Summary of file changes reverted
 
 ---@class OmpSelectionRange
 ---@field start number Starting line number (inclusive)

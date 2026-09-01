@@ -25,7 +25,7 @@ local function invalid_arguments(message)
   }, 0)
 end
 
-local function extract_hash_arg(value)
+local function extract_ref_arg(value)
   if type(value) == 'table' then
     value = value[1]
   end
@@ -37,10 +37,9 @@ local function extract_hash_arg(value)
   return nil
 end
 
----@param from_snapshot_id? string
----@param _to_snapshot_id? string|number
-M.actions.diff_open = with_output_open(function(from_snapshot_id, _to_snapshot_id)
-  git_review.review(extract_hash_arg(from_snapshot_id))
+---@param ref? string
+M.actions.diff_open = with_output_open(function(ref)
+  git_review.review(extract_ref_arg(ref))
 end, true)
 
 M.actions.diff_next = with_output_open(function()

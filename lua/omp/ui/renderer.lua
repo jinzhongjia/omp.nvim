@@ -44,7 +44,7 @@ end
 ---@return boolean
 local function is_renderer_synthetic_message(message)
   local message_id = message and message.info and message.info.id
-  return message_id == '__omp_revert_message__' or message_id == HIDDEN_MESSAGES_NOTICE_MESSAGE_ID
+  return message_id == HIDDEN_MESSAGES_NOTICE_MESSAGE_ID
 end
 
 ---@param message OmpMessage|nil
@@ -63,33 +63,10 @@ local function get_real_session_messages(messages)
 end
 
 ---@param messages OmpMessage[]|nil
----@return integer|nil
-local function get_revert_index(messages)
-  local revert = state.active_session and state.active_session.revert
-  local revert_message_id = revert and revert.messageID
-  if not revert_message_id then
-    return nil
-  end
-
-  local real_messages = get_real_session_messages(messages)
-  for i, message in ipairs(real_messages) do
-    if message.info and message.info.id == revert_message_id then
-      return i
-    end
-  end
-
-  return nil
-end
-
----@param messages OmpMessage[]|nil
 ---@return OmpMessage[] visible_messages
 ---@return integer hidden_count
 local function get_visible_session_messages(messages)
   local real_messages = get_real_session_messages(messages)
-  local revert_index = get_revert_index(messages)
-  if revert_index then
-    real_messages = vim.list_slice(real_messages, 1, revert_index - 1)
-  end
 
   local limit = get_max_rendered_messages()
   if not limit or #real_messages <= limit then
@@ -335,8 +312,7 @@ local function fetch_session()
   return require('omp.session').get_messages(session)
 end
 
----Render all messages and parts from session_data into the output buffer
----Called after a full session fetch or when revert state changes
+---Render all messages and parts from session_data into the output buffer.
 ---@param session_data OmpMessage[]
 ---@param opts? { restore_model_from_messages?: boolean }
 function M._render_full_session_data(session_data, opts)
@@ -354,7 +330,6 @@ function M._render_full_session_data(session_data, opts)
   reference_facts.rebuild(state.active_session.id, state.messages)
 
   local visible_messages, hidden_count = get_visible_session_messages(state.messages)
-  local revert_index = get_revert_index(state.messages)
 
   if lazy_limit == nil then
     local initial = get_initial_render_count()
@@ -389,30 +364,6 @@ function M._render_full_session_data(session_data, opts)
         events.on_part_updated({ part = part })
       end
     end
-  end
-
-  if revert_index then
-    local revert_message = {
-      info = {
-        id = '__omp_revert_message__',
-        sessionID = state.active_session.id,
-        role = 'system',
-      },
-      parts = {
-        {
-          id = '__omp_revert_part__',
-          messageID = '__omp_revert_message__',
-          sessionID = state.active_session.id,
-          type = 'revert-display',
-          state = {
-            revert_index = revert_index,
-          },
-        },
-      },
-    }
-
-    events.on_message_updated(revert_message)
-    events.on_part_updated({ part = revert_message.parts[1] })
   end
 
   local t_format_end = vim.uv.hrtime()

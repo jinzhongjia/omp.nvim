@@ -101,13 +101,11 @@ end
 ---@param fn fun()
 local function with_model_runtime_snapshot(fn)
   local original_model = state.current_model
-  local original_mode = state.current_mode
   local original_messages = state.messages
 
   local ok, err = pcall(fn)
 
   state.model.set_model(original_model)
-  state.model.set_mode(original_mode)
   state.renderer.set_messages(original_messages)
 
   if not ok then
@@ -390,7 +388,7 @@ describe('omp.api', function()
     it('requires a prompt after prefixes', function()
       local notify_stub = stub(vim, 'notify')
 
-      local result = commands.execute_command_opts({ args = 'run agent=plan', range = 0 })
+      local result = commands.execute_command_opts({ args = 'run thinking=high', range = 0 })
 
       assert.is_nil(result)
       assert.stub(notify_stub).was_called_with('Prompt required', vim.log.levels.ERROR)
@@ -491,52 +489,38 @@ describe('omp.api', function()
   end)
 
   describe('slash commands with user commands', function()
-    describe('user command model/agent selection', function()
+    describe('backend command dispatch', function()
       before_each(function()
         stub(api, 'open_input').invokes(function()
           return resolved('done')
         end)
-        local config_file = require('omp.config_file')
-        stub(config_file, 'get_omp_agents').returns(resolved({ 'plan', 'build' }))
       end)
 
-      it('invokes run with correct model and agent', function()
+      it('dispatches the command name and arguments to OMP', function()
         with_user_commands({
-          ['test-with-model'] = {
+          ['test-command'] = {
             description = 'Run tests',
-            template = 'Run tests with $ARGUMENTS',
-            model = 'openai/gpt-4',
-            agent = 'tester',
           },
         }, function()
           with_session_client_snapshot(function()
             state.session.set_active(mk_session('test-session'))
 
-            local send_command_calls = {}
+            local calls = {}
             state.jobs.set_api_client({
-              base_url = 'http://127.0.0.1:4000',
               send_command = function(_self, session_id, command_data)
-                table.insert(send_command_calls, { session_id = session_id, command_data = command_data })
-                return {
-                  and_then = function()
-                    return {}
-                  end,
-                }
+                table.insert(calls, { session_id = session_id, command_data = command_data })
+                return resolved(true)
               end,
             })
 
-            local slash_commands = slash.get_commands():wait()
-            local test_with_model_cmd = find_slash_command(slash_commands, '/test-with-model')
+            local command = find_slash_command(slash.get_commands():wait(), '/test-command')
+            assert.truthy(command)
+            command.fn({ 'one', 'two' }):wait()
 
-            assert.truthy(test_with_model_cmd, 'Should find /test-with-model command')
-
-            test_with_model_cmd.fn():wait()
-            assert.equal(1, #send_command_calls)
-            assert.equal('test-session', send_command_calls[1].session_id)
-            assert.equal('test-with-model', send_command_calls[1].command_data.command)
-            assert.equal('', send_command_calls[1].command_data.arguments)
-            assert.equal('openai/gpt-4', send_command_calls[1].command_data.model)
-            assert.equal('tester', send_command_calls[1].command_data.agent)
+            assert.equal(1, #calls)
+            assert.equal('test-session', calls[1].session_id)
+            assert.equal('test-command', calls[1].command_data.command)
+            assert.equal('one two', calls[1].command_data.arguments)
           end)
         end)
       end)
@@ -548,7 +532,7 @@ describe('omp.api', function()
         local custom_cmd = find_slash_command(slash_commands, '/custom')
 
         assert.truthy(custom_cmd, 'Should include /custom command')
-        assert.equal('User command', custom_cmd.desc)
+        assert.equal('OMP command', custom_cmd.desc)
       end)
     end)
 
@@ -579,7 +563,6 @@ describe('omp.api', function()
     it('falls back to config file model when state.current_model is nil', function()
       with_model_runtime_snapshot(function()
         state.model.clear_model()
-        state.model.clear_mode()
         state.renderer.set_messages(nil)
 
         with_omp_config({ model = 'testmodel' }, function()
@@ -592,14 +575,12 @@ describe('omp.api', function()
     it('does not overwrite a user-selected model from prior session messages', function()
       with_model_runtime_snapshot(function()
         state.model.set_model('openai/gpt-4.1')
-        state.model.set_mode('plan')
         state.renderer.set_messages({
           {
             info = {
               id = 'm1',
               providerID = 'anthropic',
               modelID = 'claude-3-opus',
-              mode = 'build',
             },
           },
         })
@@ -608,7 +589,6 @@ describe('omp.api', function()
 
         assert.equal('openai/gpt-4.1', model)
         assert.equal('openai/gpt-4.1', state.current_model)
-        assert.equal('plan', state.current_mode)
       end)
     end)
   end)

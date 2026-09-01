@@ -7,7 +7,6 @@ loaded.services_messaging_spec = true
 
 local messaging = require('omp.services.messaging')
 local session_runtime = require('omp.services.session_runtime')
-local config_file = require('omp.config_file')
 local context = require('omp.context')
 local state = require('omp.state')
 local Promise = require('omp.promise')
@@ -49,202 +48,32 @@ describe('omp.services.messaging', function()
     assert.is_false(sent)
   end)
 
-  it('persist options in state when sending message', function()
-    local orig = state.api_client.create_message
+  it('persists context, model, and thinking level when sending', function()
+    local original = state.api_client.create_message
     state.ui.set_windows({ mock = 'windows' })
     state.session.set_active({ id = 'sess1' })
 
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
-
-    local create_called = false
-    state.api_client.create_message = function(_, sid, params)
-      create_called = true
-      assert.equal('sess1', sid)
-      assert.truthy(params.parts)
+    local captured
+    state.api_client.create_message = function(_, session_id, params)
+      assert.equal('sess1', session_id)
+      captured = params
       return Promise.new():resolve({ id = 'm1' })
     end
 
-    messaging.send_message(
-      'hello world',
-      { context = { current_file = { enabled = false } }, agent = 'plan', model = 'test/model' }
-    )
-    assert.same(state.current_context_config, { current_file = { enabled = false } })
-    assert.equal(state.current_mode, 'plan')
-    assert.equal(state.current_model, 'test/model')
-    assert.is_true(create_called)
-    state.api_client.create_message = orig
-    config_file.get_omp_agents:revert()
-  end)
+    messaging
+      .send_message('hello world', {
+        context = { current_file = { enabled = false } },
+        model = 'test/model',
+        thinking_level = 'high',
+      })
+      :wait()
 
-  it('does not switch mode when agent is hidden', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.session.set_active({ id = 'sess1' })
-    state.model.set_mode('build')
-
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
-
-    local captured_params = nil
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      captured_params = params
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    messaging.send_message('hello world', { agent = 'hidden-xyz' })
-    vim.wait(50, function()
-      return captured_params ~= nil
-    end)
-
-    assert.equal('build', state.current_mode)
-    assert.equal('hidden-xyz', captured_params.agent)
-
-    state.api_client.create_message = orig
-    config_file.get_omp_agents:revert()
-  end)
-
-  it('switches mode when agent is visible', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.session.set_active({ id = 'sess1' })
-    state.model.set_mode('build')
-
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
-
-    local captured_params = nil
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      captured_params = params
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    messaging.send_message('hello world', { agent = 'plan' })
-    vim.wait(50, function()
-      return captured_params ~= nil
-    end)
-
-    assert.equal('plan', state.current_mode)
-    assert.equal('plan', captured_params.agent)
-
-    state.api_client.create_message = orig
-    config_file.get_omp_agents:revert()
-  end)
-
-  it('returns false when active session is a child session', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.session.set_active({ id = 'child1', parentID = 'parent1' })
-
-    local create_called = false
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      create_called = true
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    local sent = messaging.send_message('hello world'):wait()
-    assert.is_false(sent)
-    assert.is_false(create_called)
-    state.api_client.create_message = orig
-  end)
-
-  it('sends message to child session when child_readonly is false', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.session.set_active({ id = 'child1', parentID = 'parent1' })
-    local config = require('omp.config')
-    local orig_readonly = config.values.child_readonly
-    config.values.child_readonly = false
-
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'build' }))
-
-    local create_called = false
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      create_called = true
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    messaging.send_message('hello world')
-    vim.wait(50, function()
-      return create_called
-    end)
-    assert.is_true(create_called)
-    state.api_client.create_message = orig
-    config.values.child_readonly = orig_readonly
-    config_file.get_omp_agents:revert()
-  end)
-
-  it('sends inferred agent for child session', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.model.set_mode('study') -- set by switch_session inference
-    state.session.set_active({ id = 'child1', parentID = 'parent1' })
-    local config = require('omp.config')
-    local orig_readonly = config.values.child_readonly
-    config.values.child_readonly = false
-
-    local captured_params = nil
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      captured_params = params
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    messaging.send_message('hello world')
-    vim.wait(50, function()
-      return captured_params ~= nil
-    end)
-
-    assert.equal('study', captured_params.agent)
-    state.api_client.create_message = orig
-    config.values.child_readonly = orig_readonly
-  end)
-
-  it('respects explicit agent for child session', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.session.set_active({ id = 'child1', parentID = 'parent1' })
-    local config = require('omp.config')
-    local orig_readonly = config.values.child_readonly
-    config.values.child_readonly = false
-
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'study', 'build' }))
-
-    local captured_params = nil
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      captured_params = params
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    messaging.send_message('hello world', { agent = 'study' })
-    vim.wait(50, function()
-      return captured_params ~= nil
-    end)
-
-    assert.equal('study', captured_params.agent)
-    state.api_client.create_message = orig
-    config.values.child_readonly = orig_readonly
-    config_file.get_omp_agents:revert()
-  end)
-
-  it('sends agent param for parent session', function()
-    state.ui.set_windows({ mock = 'windows' })
-    state.model.set_mode('build')
-    state.session.set_active({ id = 'sess1' })
-
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'build' }))
-
-    local captured_params = nil
-    local orig = state.api_client.create_message
-    state.api_client.create_message = function(_, sid, params)
-      captured_params = params
-      return Promise.new():resolve({ id = 'm1' })
-    end
-
-    messaging.send_message('hello world')
-    vim.wait(50, function()
-      return captured_params ~= nil
-    end)
-
-    assert.equal('build', captured_params.agent)
-    state.api_client.create_message = orig
-    config_file.get_omp_agents:revert()
+    assert.same({ current_file = { enabled = false } }, state.current_context_config)
+    assert.equal('test/model', state.current_model)
+    assert.equal('high', state.current_thinking_level)
+    assert.same({ providerID = 'test', modelID = 'model' }, captured.model)
+    assert.equal('high', captured.thinking_level)
+    state.api_client.create_message = original
   end)
 
   it('increments and decrements user_message_count correctly', function()

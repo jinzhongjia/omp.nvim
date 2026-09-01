@@ -13,6 +13,9 @@ local log = require('omp.log')
 ---@field listeners fun(event: table)[]
 ---@field available_commands table[]
 ---@field busy table<string, boolean>
+---@field run_promises table<string, Promise<boolean>>
+---@field prompt_sessions table<string, string>
+---@field next_prompt_id integer
 ---@field spawn_promise Promise<OmpApiClient>
 ---@field shutdown_promise Promise<boolean>
 ---@field url string
@@ -198,6 +201,9 @@ function OmpApiClient.new(cwd)
     listeners = {},
     available_commands = {},
     busy = {},
+    run_promises = {},
+    prompt_sessions = {},
+    next_prompt_id = 0,
     spawn_promise = Promise.new(),
     shutdown_promise = Promise.new(),
     url = 'stdio://omp',
@@ -214,6 +220,9 @@ function OmpApiClient:_emit(event)
   if status and session_id then
     self.busy[session_id] = status.type == 'busy'
   end
+  if event.type == 'session.idle' and session_id and self.run_promises[session_id] then
+    self.run_promises[session_id]:resolve(true)
+  end
   for _, listener in ipairs(vim.deepcopy(self.listeners)) do
     local ok, err = pcall(listener, event)
     if not ok then
@@ -225,6 +234,14 @@ end
 function OmpApiClient:_attach(process, adapter)
   self.adapters[process] = adapter
   process:subscribe(function(frame)
+    if frame.type == 'prompt_result' and frame.id then
+      local session_id = self.prompt_sessions[frame.id]
+      if session_id and frame.agentInvoked == false and self.run_promises[session_id] then
+        self.run_promises[session_id]:resolve(true)
+      end
+      self.prompt_sessions[frame.id] = nil
+      return
+    end
     if frame.type == 'available_commands_update' then
       self.available_commands = frame.commands or {}
       return
@@ -318,11 +335,15 @@ function OmpApiClient:_session_from_state(data, fallback)
   return session
 end
 
-function OmpApiClient:_spawn_session(existing)
+---@param existing? Session
+---@param opts? {no_session?: boolean}
+function OmpApiClient:_spawn_session(existing, opts)
+  opts = opts or {}
   return Promise.async(function()
     local process = Process.new({
       cwd = (existing and existing.directory) or self.cwd,
       resume = existing and existing.sessionPath or nil,
+      no_session = not existing and opts.no_session == true,
     })
     local adapter = Adapter.new({ session_id = existing and existing.id or '' })
     self:_attach(process, adapter)
@@ -365,7 +386,6 @@ function OmpApiClient:get_config()
     end
     return {
       model = model_id(state.model),
-      agent = { default = { mode = 'primary' } },
       command = command_config,
     }
   end)()
@@ -382,7 +402,7 @@ function OmpApiClient:list_providers()
         name = model.name or model.id,
         limit = { context = model.contextWindow, output = model.maxTokens },
         modalities = model.modalities,
-        variants = model.reasoning and { low = {}, medium = {}, high = {} } or nil,
+        reasoning = model.reasoning == true,
       }
     end
     local providers = {}
@@ -440,6 +460,37 @@ function OmpApiClient:create_session(session_data)
     return session
   end)()
 end
+function OmpApiClient:create_ephemeral_session(title)
+  return Promise.async(function()
+    local process = self:_spawn_session(nil, { no_session = true }):await()
+    local data = process:request({ type = 'get_state' }):await()
+    local session = self.sessions[data.sessionId]
+    session.ephemeral = true
+    if title and title ~= '' then
+      process:request({ type = 'set_session_name', name = title }):await()
+      session.title = title
+    end
+    return session
+  end)()
+end
+
+function OmpApiClient:release_session(id)
+  local process = self.processes[id]
+  self.processes[id] = nil
+  self.sessions[id] = nil
+  self.busy[id] = nil
+  self.run_promises[id] = nil
+  for prompt_id, session_id in pairs(self.prompt_sessions) do
+    if session_id == id then
+      self.prompt_sessions[prompt_id] = nil
+    end
+  end
+  if not process then
+    return Promise.new():resolve(true)
+  end
+  self.adapters[process] = nil
+  return process:shutdown()
+end
 
 function OmpApiClient:get_session(id)
   local session = self.sessions[id] or find_session(id, self.cwd)
@@ -447,10 +498,6 @@ function OmpApiClient:get_session(id)
     self.sessions[id] = session
   end
   return Promise.new():resolve(session)
-end
-
-function OmpApiClient:delete_session()
-  return reject('OMP RPC does not support deleting sessions')
 end
 
 function OmpApiClient:update_session(id, update)
@@ -488,24 +535,37 @@ function OmpApiClient:create_message(id, params)
         :request({ type = 'set_model', provider = params.model.providerID, modelId = params.model.modelID })
         :await()
     end
-    if params.variant then
-      process:request({ type = 'set_thinking_level', level = params.variant }):await()
+    if params.thinking_level then
+      process:request({ type = 'set_thinking_level', level = params.thinking_level }):await()
     end
     local message, images = serialize_prompt(params)
     local behavior = self.busy[id] and 'followUp' or nil
-    process
+    local run_promise = Promise.new()
+    self.run_promises[id] = run_promise
+    self.next_prompt_id = self.next_prompt_id + 1
+    local prompt_id = string.format('nvim-prompt-%d', self.next_prompt_id)
+    self.prompt_sessions[prompt_id] = id
+    local response = process
       :request({
+        id = prompt_id,
         type = 'prompt',
         message = message,
         images = #images > 0 and images or nil,
         streamingBehavior = behavior,
       })
       :await()
+    if response and response.agentInvoked == false then
+      run_promise:resolve(true)
+      self.prompt_sessions[prompt_id] = nil
+    end
     return {
       info = { id = 'prompt-' .. tostring(os.time()), sessionID = id, role = 'user' },
       parts = {},
     }
   end)()
+end
+function OmpApiClient:wait_for_idle(id)
+  return self.run_promises[id] or reject('No active OMP run for session: ' .. tostring(id))
 end
 
 function OmpApiClient:abort_session(id)

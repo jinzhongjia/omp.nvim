@@ -45,7 +45,7 @@ This is a structural boundary, not a temporary migration layer.
 
 - `agent_model.lua`
   - Responsible for:
-    - model/mode/provider/variant operations
+    - model/provider/thinking-level operations
     - model selection-related orchestration API
   - Not responsible for:
     - session lifecycle orchestration
@@ -76,9 +76,7 @@ The following entry files still directly require `omp.session`/`omp.api` and sho
 - [ ] `lua/omp/ui/permission_window.lua` -> `omp.api`
 - [ ] `lua/omp/ui/contextual_actions.lua` -> `omp.api`
 - [ ] `lua/omp/ui/session_picker.lua` -> `omp.api`
-- [ ] `lua/omp/ui/timeline_picker.lua` -> `omp.api`
 - [ ] `lua/omp/ui/ui.lua` -> `omp.api`
-- [ ] `lua/omp/commands/handlers/diff.lua` -> `omp.session`
 - [ ] `lua/omp/commands/handlers/session.lua` -> `omp.session`
 
 Sync rule:

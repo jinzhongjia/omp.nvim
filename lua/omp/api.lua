@@ -107,8 +107,8 @@ local action_groups = {
 
   agent = {
     configure_provider = agent.configure_provider,
-    configure_variant = agent.configure_variant,
-    cycle_variant = agent.cycle_variant,
+    configure_thinking_level = agent.configure_thinking_level,
+    cycle_thinking_level = agent.cycle_thinking_level,
   },
 
   query = {

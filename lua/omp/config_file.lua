@@ -73,7 +73,7 @@ end
 --- Get model information for a specific provider and model
 --- @param provider string Provider ID
 --- @param model string Model ID
---- @return OmpModel|nil Model information with variants
+--- @return OmpModel|nil Model information
 M.get_model_info = function(provider, model)
   local providers_response = M.get_omp_providers():peek()
 
@@ -89,11 +89,6 @@ M.get_model_info = function(provider, model)
 
   return filtered_providers[1] and filtered_providers[1].models and filtered_providers[1].models[model] or nil
 end
-
----@type fun(): Promise<string[]>
-M.get_omp_agents = Promise.async(function()
-  return { 'default' }
-end)
 
 ---@type fun(): Promise<string[]>
 M.get_subagents = Promise.async(function()

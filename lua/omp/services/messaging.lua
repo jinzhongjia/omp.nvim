@@ -2,7 +2,6 @@ local state = require('omp.state')
 local context = require('omp.context')
 local util = require('omp.util')
 local config = require('omp.config')
-local config_file = require('omp.config_file')
 local Promise = require('omp.promise')
 local log = require('omp.log')
 local agent_model = require('omp.services.agent_model')
@@ -15,10 +14,6 @@ local M = {}
 --- @param opts? SendMessageOpts
 M.send_message = Promise.async(function(prompt, opts)
   if not state.active_session or not state.active_session.id then
-    return false
-  end
-
-  if state.active_session.parentID and config.child_readonly then
     return false
   end
 
@@ -36,10 +31,7 @@ M.send_message = Promise.async(function(prompt, opts)
   state.context.set_current_context_config(opts.context)
   context.load()
   opts.model = opts.model or agent_model.initialize_current_model():await()
-  if opts.agent == nil then
-    opts.agent = state.current_mode or config.default_mode
-  end
-  opts.variant = opts.variant or state.current_variant
+  opts.thinking_level = opts.thinking_level or state.current_thinking_level
   local params = {}
 
   if opts.model then
@@ -47,17 +39,9 @@ M.send_message = Promise.async(function(prompt, opts)
     params.model = { providerID = provider, modelID = model }
     state.model.set_model(opts.model)
 
-    if opts.variant then
-      params.variant = opts.variant
-      state.model.set_variant(opts.variant)
-    end
-  end
-
-  if opts.agent then
-    params.agent = opts.agent
-    local available_agents = config_file.get_omp_agents():await()
-    if vim.tbl_contains(available_agents, opts.agent) then
-      state.model.set_mode(opts.agent)
+    if opts.thinking_level then
+      params.thinking_level = opts.thinking_level
+      state.model.set_thinking_level(opts.thinking_level)
     end
   end
 

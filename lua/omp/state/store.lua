@@ -14,16 +14,14 @@ local M = {}
 ---@field current_code_view table|nil
 ---@field saved_window_options table|nil
 ---@field display_route string|nil
----@field current_mode string|nil
 ---@field last_output number
 ---@field last_sent_context OmpContext|nil
 ---@field current_context_config OmpContextConfig|nil
 ---@field context_updated_at number|nil
 ---@field active_session Session|nil
 ---@field current_model string|nil
----@field user_mode_model_map table<string, string>
 ---@field current_model_info table|nil
----@field current_variant string|nil
+---@field current_thinking_level string|nil
 ---@field messages OmpMessage[]|nil
 ---@field current_message OmpMessage|nil
 ---@field pending_permissions OmpPermission[]
@@ -55,7 +53,6 @@ local _state = {
   current_code_buf = nil,
   saved_window_options = nil,
   display_route = nil,
-  current_mode = nil,
   last_output = 0,
   pre_zoom_width = nil,
   last_window_width_ratio = nil,
@@ -64,9 +61,8 @@ local _state = {
   context_updated_at = nil,
   active_session = nil,
   current_model = nil,
-  user_mode_model_map = {},
   current_model_info = nil,
-  current_variant = nil,
+  current_thinking_level = nil,
   messages = nil,
   current_message = nil,
   pending_permissions = {},

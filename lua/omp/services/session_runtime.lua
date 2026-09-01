@@ -44,13 +44,12 @@ function M.list_sessions_by_scope(scope)
   return session.get_all_workspace_sessions():await() or {}
 end
 
----Keep only pickable sessions: non-empty title and matching parent_id.
+---Keep only sessions with a non-empty title.
 ---@param sessions Session[]|GlobalSession[]
----@param parent_id? string nil selects mainline (no parent), otherwise children of parent_id
 ---@return Session[]
-function M.filter_pickable_sessions(sessions, parent_id)
+function M.filter_pickable_sessions(sessions)
   return vim.tbl_filter(function(s)
-    return s ~= nil and s.title ~= '' and s.parentID == parent_id
+    return s ~= nil and s.title ~= ''
   end, sessions)
 end
 
@@ -60,30 +59,21 @@ local function focus_after_session_switch(selected_session)
     return
   end
 
-  if selected_session and selected_session.parentID and config.child_readonly then
-    if not input_window.is_hidden() then
-      input_window._hide()
-    end
-    ui.focus_output()
-    return
-  end
-
   if input_window.is_hidden() then
     input_window._show()
   end
   ui.focus_input()
 end
 
----@param parent_id string?
----@param scope? 'project' | 'global' when nil, defaults to project-scoped
-M.select_session = Promise.async(function(parent_id, scope)
+---@param scope? 'project' | 'global'
+M.select_session = Promise.async(function(scope)
   local all_sessions = M.list_sessions_by_scope(scope)
   ---@cast all_sessions Session[]
 
-  local filtered_sessions = M.filter_pickable_sessions(all_sessions, parent_id)
+  local filtered_sessions = M.filter_pickable_sessions(all_sessions)
 
   if #filtered_sessions == 0 then
-    vim.notify(parent_id and 'No child sessions found' or 'No sessions found', vim.log.levels.INFO)
+    vim.notify('No sessions found', vim.log.levels.INFO)
     if state.ui.is_visible() then
       ui.focus_input()
     end
@@ -105,7 +95,7 @@ M.switch_session = Promise.async(function(session_id)
   local selected_session = session.get_by_id(session_id):await()
 
   state.model.clear()
-  agent_model.ensure_current_mode():await()
+  agent_model.initialize_current_model():await()
   state.session.set_active(selected_session)
   focus_after_session_switch(selected_session)
 end)
@@ -196,11 +186,11 @@ M.open = Promise.async(function(opts)
     if opts.new_session then
       state.session.clear_active()
       context.unload_attachments()
-      agent_model.ensure_current_mode():await()
+      agent_model.initialize_current_model():await()
       state.session.set_active(M.create_new_session():await())
       log.debug('Created new session on open', { session = state.active_session.id })
     else
-      agent_model.ensure_current_mode():await()
+      agent_model.initialize_current_model():await()
       if not state.active_session then
         state.session.set_active(session.get_last_workspace_session():await())
         if not state.active_session then

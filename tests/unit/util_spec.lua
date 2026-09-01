@@ -34,9 +34,9 @@ describe('util.parse_run_args', function()
     assert.equals('just a regular prompt', prompt)
   end)
 
-  it('parses single agent prefix', function()
-    local opts, prompt = util.parse_run_args({ 'agent=plan', 'hello', 'world' })
-    assert.are.same({ agent = 'plan' }, opts)
+  it('parses a thinking level prefix', function()
+    local opts, prompt = util.parse_run_args({ 'thinking=high', 'hello', 'world' })
+    assert.are.same({ thinking_level = 'high' }, opts)
     assert.equals('hello world', prompt)
   end)
 
@@ -54,15 +54,15 @@ describe('util.parse_run_args', function()
 
   it('parses multiple prefixes in order', function()
     local opts, prompt = util.parse_run_args({
-      'agent=plan',
       'model=openai/gpt-4',
+      'thinking=medium',
       'context=current_file.enabled=false',
       'prompt',
       'here',
     })
     assert.are.same({
-      agent = 'plan',
       model = 'openai/gpt-4',
+      thinking_level = 'medium',
       context = { current_file = { enabled = false } },
     }, opts)
     assert.equals('prompt here', prompt)
@@ -80,8 +80,8 @@ describe('util.parse_run_args', function()
   end)
 
   it('handles empty prompt after prefixes', function()
-    local opts, prompt = util.parse_run_args({ 'agent=plan' })
-    assert.are.same({ agent = 'plan' }, opts)
+    local opts, prompt = util.parse_run_args({ 'thinking=low' })
+    assert.are.same({ thinking_level = 'low' }, opts)
     assert.equals('', prompt)
   end)
 
@@ -92,8 +92,8 @@ describe('util.parse_run_args', function()
   end)
 
   it('stops parsing at first non-prefix token', function()
-    local opts, prompt = util.parse_run_args({ 'agent=plan', 'some', 'prompt', 'model=openai/gpt-4' })
-    assert.are.same({ agent = 'plan' }, opts)
+    local opts, prompt = util.parse_run_args({ 'thinking=high', 'some', 'prompt', 'model=openai/gpt-4' })
+    assert.are.same({ thinking_level = 'high' }, opts)
     assert.equals('some prompt model=openai/gpt-4', prompt)
   end)
 end)

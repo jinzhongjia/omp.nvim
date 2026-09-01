@@ -94,9 +94,10 @@ require('omp').setup({
 | `<leader>oI` | 新会话中打开输入窗口 |
 | `<leader>os` | 选择会话 |
 | `<leader>op` | 选择模型 |
+| `<leader>oV` | 选择 OMP thinking level |
 | `<leader>ov` | 粘贴图片 |
 | `<leader>od` | 查看当前 Git diff |
-| `<leader>o/` | Quick chat |
+| `<leader>o/` | Quick Chat（独立 `--no-session` 进程） |
 | `<C-c>` | 取消当前请求 |
 
 Lua API：
@@ -131,15 +132,15 @@ omp RPC 虽提供 `switch_session`，但跨会话共享一个进程会失去并�
 
 ## 当前边界
 
-以下 opencode.nvim 功能没有等价的 omp RPC 接口，已从命令和默认按键中移除：
+以下 opencode.nvim 专属 UI 没有等价的 OMP RPC 数据模型，已从命令、按键和渲染状态中移除：
 
-- opencode snapshot/timeline undo/redo
-- share/unshare
-- MCP 连接管理面板
-- 子会话树和基于 opencode message ID 的 fork
+- snapshot/timeline undo/redo 与恢复点
+- MCP 连接管理面板；OMP 原生 `/mcp` 命令仍可用
+- 子会话树、child-session 跳转和基于 opencode message ID 的 fork
 - 会话删除
+- agent mode、`DEFAULT/BUILD/PLAN` 标签和 variant 概念
 
-Diff 面板仅展示当前 Git 工作区改动，不提供 snapshot 恢复。
+OMP 原生 slash commands（包括 `/share`、`/mcp`、`/review`）直接由 RPC 命令列表提供。Diff 面板仅展示当前 Git 工作区改动。
 
 ## 开发
 

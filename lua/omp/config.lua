@@ -9,7 +9,6 @@ M.defaults = {
   preferred_picker = nil,
   preferred_completion = nil,
   default_global_keymaps = true,
-  default_mode = 'default',
   default_system_prompt = nil,
   keymap_prefix = '<leader>o',
   omp_executable = 'omp',
@@ -31,7 +30,7 @@ M.defaults = {
       ['<leader>os'] =  { 'select_session',                                    desc = 'Select session' },
       ['<leader>oR'] =  { 'rename_session',                                    desc = 'Rename session' },
       ['<leader>op'] =  { 'configure_provider',                                desc = 'Configure provider' },
-      ['<leader>oV'] =  { 'configure_variant',                                 desc = 'Configure model variant' },
+      ['<leader>oV'] =  { 'configure_thinking_level',                          desc = 'Configure thinking level' },
       ['<leader>oy'] =  { 'add_visual_selection',         mode = { 'v' },      desc = 'Add visual selection to context' },
       ['<leader>oY'] =  { 'add_visual_selection_inline',  mode = { 'v' },      desc = 'Insert visual selection inline into input' },
       ['<leader>oz'] =  { 'toggle_zoom',                                       desc = 'Toggle zoom' },
@@ -60,7 +59,7 @@ M.defaults = {
       ['gf']    =       { 'jump_to_file',                                       desc = 'Jump to file at cursor' },
       ['<CR>']  =       { 'jump_to_target_at_cursor',                          desc = 'Jump to target at cursor' },
       ['<M-i>'] =       { 'toggle_input',                 mode = { 'n' },      desc = 'Toggle input window' },
-      ['<M-r>'] =       { 'cycle_variant',                mode = { 'n' },      desc = 'Cycle model variants' },
+      ['<M-r>'] =       { 'cycle_thinking_level',             mode = { 'n' },      desc = 'Cycle thinking levels' },
       ['<leader>oD'] =  { 'debug_message',                                     desc = 'Open raw message debug view' },
       ['<leader>oO'] =  { 'debug_output',                                      desc = 'Open raw output debug view' },
       ['<leader>ods'] = { 'debug_session',                                     desc = 'Open raw session debug view' },
@@ -78,7 +77,7 @@ M.defaults = {
       ['<tab>']  =      { 'toggle_pane',                  mode = { 'n' },      desc = 'Toggle input/output panes',    defer_to_completion = true },
       ['<up>']   =      { 'prev_prompt_history',          mode = { 'n', 'i' }, desc = 'Previous prompt history item', defer_to_completion = true },
       ['<down>'] =      { 'next_prompt_history',          mode = { 'n', 'i' }, desc = 'Next prompt history item' ,    defer_to_completion = true },
-      ['<M-r>']  =      { 'cycle_variant',                mode = { 'n', 'i' }, desc = 'Cycle model variants'                                     },
+      ['<M-r>']  =      { 'cycle_thinking_level',             mode = { 'n', 'i' }, desc = 'Cycle thinking levels'                                    },
       ['<M-i>']  =      { 'toggle_input',                 mode = { 'n', 'i' }, desc = 'Toggle input window'                                      },
       ['gr']     =      { 'references',                                        desc = 'Browse code references'                                   },
       ['<leader>oD'] =  { 'debug_message',                                     desc = 'Open raw message debug view'                              },
@@ -264,7 +263,7 @@ M.defaults = {
   debug = {
     enabled = false,
     capture_streamed_events = false,
-    show_ids = true,
+    show_ids = false,
     highlight_changed_lines = false,
     highlight_changed_lines_timeout_ms = 120,
     quick_chat = {
@@ -273,7 +272,6 @@ M.defaults = {
     },
   },
   prompt_guard = nil,
-  child_readonly = true,
   hooks = {
     on_file_edited = nil,
     on_session_loaded = nil,
@@ -282,7 +280,6 @@ M.defaults = {
   },
   quick_chat = {
     default_model = nil,
-    default_agent = nil,
     instructions = nil, -- Use instructions prompt by default
   },
 }

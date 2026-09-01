@@ -1,251 +1,75 @@
-local loaded = rawget(_G, '__omp_service_spec_loaded') or {}
-_G.__omp_service_spec_loaded = loaded
-if loaded.services_agent_model_spec then
-  return
-end
-loaded.services_agent_model_spec = true
-
 local agent_model = require('omp.services.agent_model')
 local config_file = require('omp.config_file')
+local model_state = require('omp.model_state')
 local state = require('omp.state')
 local Promise = require('omp.promise')
 local stub = require('luassert.stub')
-local assert = require('luassert')
+
+local function resolved(value)
+  return Promise.new():resolve(value)
+end
 
 describe('omp.services.agent_model', function()
-  it('sets current model from config file when mode has a model configured', function()
-    local agents_promise = Promise.new()
-    agents_promise:resolve({ 'plan', 'build', 'custom' })
-    local config_promise = Promise.new()
-    config_promise:resolve({
-      agent = {
-        custom = {
-          model = 'anthropic/claude-3-opus',
-        },
-      },
-      model = 'gpt-4',
-    })
-
-    stub(config_file, 'get_omp_agents').returns(agents_promise)
-    stub(config_file, 'get_omp_config').returns(config_promise)
-
-    state.store.set('current_mode', nil)
-    state.store.set('current_model', nil)
-    state.store.set('user_mode_model_map', {})
-
-    local promise = agent_model.switch_to_mode('custom')
-    local success = promise:wait()
-
-    assert.is_true(success)
-    assert.equal('custom', state.current_mode)
-    assert.equal('anthropic/claude-3-opus', state.current_model)
-
-    config_file.get_omp_agents:revert()
-    config_file.get_omp_config:revert()
+  before_each(function()
+    state.model.clear()
+    state.renderer.set_messages({})
   end)
 
-  it('returns false when mode is invalid', function()
-    local agents_promise = Promise.new()
-    agents_promise:resolve({ 'plan', 'build' })
-
-    stub(config_file, 'get_omp_agents').returns(agents_promise)
-
-    local promise = agent_model.switch_to_mode('nonexistent')
-    local success = promise:wait()
-
-    assert.is_false(success)
-
-    config_file.get_omp_agents:revert()
+  after_each(function()
+    pcall(function()
+      config_file.get_omp_config:revert()
+    end)
+    pcall(function()
+      config_file.get_model_info:revert()
+    end)
+    pcall(function()
+      model_state.set_thinking_level:revert()
+    end)
   end)
 
-  it('returns false when mode is empty', function()
-    local promise = agent_model.switch_to_mode('')
-    local success = promise:wait()
-    assert.is_false(success)
+  it('keeps the current user-selected model', function()
+    state.model.set_model('openai/current')
+    stub(config_file, 'get_omp_config').returns(resolved({ model = 'openai/configured' }))
 
-    promise = agent_model.switch_to_mode(nil)
-    success = promise:wait()
-    assert.is_false(success)
+    assert.equals('openai/current', agent_model.initialize_current_model():wait(1000))
   end)
 
-  it('respects user_mode_model_map priority: uses model stored in mode_model_map for mode', function()
-    local agents_promise = Promise.new()
-    agents_promise:resolve({ 'plan', 'build' })
-    local config_promise = Promise.new()
-    config_promise:resolve({
-      agent = {
-        plan = { model = 'gpt-4' },
-      },
-      model = 'gpt-3',
-    })
-    stub(config_file, 'get_omp_agents').returns(agents_promise)
-    stub(config_file, 'get_omp_config').returns(config_promise)
+  it('loads the configured model when none is selected', function()
+    stub(config_file, 'get_omp_config').returns(resolved({ model = 'anthropic/claude-test' }))
 
-    state.store.set('current_mode', nil)
-    state.store.set('current_model', 'should-be-overridden')
-    state.store.set('user_mode_model_map', { plan = 'anthropic/claude-3-haiku' })
-
-    local promise = agent_model.switch_to_mode('plan')
-    local success = promise:wait()
-    assert.is_true(success)
-    assert.equal('plan', state.current_mode)
-    assert.equal('anthropic/claude-3-haiku', state.current_model)
-
-    config_file.get_omp_agents:revert()
-    config_file.get_omp_config:revert()
+    assert.equals('anthropic/claude-test', agent_model.initialize_current_model():wait(1000))
+    assert.equals('anthropic/claude-test', state.current_model)
   end)
 
-  it('falls back to config model if nothing else matches', function()
-    local agents_promise = Promise.new()
-    agents_promise:resolve({ 'plan', 'build' })
-    local config_promise = Promise.new()
-    config_promise:resolve({
-      agent = {
-        plan = {},
-      },
-      model = 'default-model',
-    })
-    stub(config_file, 'get_omp_agents').returns(agents_promise)
-    stub(config_file, 'get_omp_config').returns(config_promise)
-    state.store.set('current_mode', nil)
-    state.store.set('current_model', 'old-model')
-    state.store.set('user_mode_model_map', {})
-
-    local promise = agent_model.switch_to_mode('plan')
-    local success = promise:wait()
-    assert.is_true(success)
-    assert.equal('plan', state.current_mode)
-    assert.equal('default-model', state.current_model)
-    config_file.get_omp_agents:revert()
-    config_file.get_omp_config:revert()
-  end)
-
-  it('keeps the current user-selected model and mode by default', function()
-    state.model.set_model('openai/gpt-4.1')
-    state.model.set_mode('plan')
+  it('restores the latest model from session messages', function()
     state.renderer.set_messages({
-      {
-        info = {
-          id = 'm1',
-          providerID = 'anthropic',
-          modelID = 'claude-3-opus',
-          mode = 'build',
-        },
-      },
+      { info = { role = 'assistant', providerID = 'openai', modelID = 'older' }, parts = {} },
+      { info = { role = 'assistant', providerID = 'anthropic', modelID = 'latest' }, parts = {} },
     })
 
-    local model = agent_model.initialize_current_model():wait()
-
-    assert.equal('openai/gpt-4.1', model)
-    assert.equal('openai/gpt-4.1', state.current_model)
-    assert.equal('plan', state.current_mode)
+    local model = agent_model.initialize_current_model({ restore_from_messages = true }):wait(1000)
+    assert.equals('anthropic/latest', model)
+    assert.equals('anthropic/latest', state.current_model)
   end)
 
-  it('restores the latest session model and mode when explicitly requested', function()
-    state.model.set_model('openai/gpt-4.1')
-    state.model.set_mode('plan')
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
+  it('cycles through OMP thinking levels', function()
+    state.model.set_model('openai/reasoning-model')
+    stub(config_file, 'get_model_info').returns({ reasoning = true })
+    local save = stub(model_state, 'set_thinking_level')
 
-    state.renderer.set_messages({
-      {
-        info = {
-          id = 'm1',
-          providerID = 'anthropic',
-          modelID = 'claude-3-opus',
-          mode = 'build',
-        },
-      },
-    })
+    agent_model.cycle_thinking_level():wait(1000)
+    assert.equals('off', state.current_thinking_level)
+    assert.stub(save).was_called_with('openai', 'reasoning-model', 'off')
 
-    local model = agent_model.initialize_current_model({ restore_from_messages = true }):wait()
-
-    assert.equal('anthropic/claude-3-opus', model)
-    assert.equal('anthropic/claude-3-opus', state.current_model)
-    assert.equal('build', state.current_mode)
-
-    config_file.get_omp_agents:revert()
+    agent_model.cycle_thinking_level():wait(1000)
+    assert.equals('minimal', state.current_thinking_level)
   end)
 
-  it('restores hidden mode from messages for child sessions', function()
-    state.model.set_model('openai/gpt-4.1')
-    state.model.set_mode('build')
-    state.session.set_active({ id = 'child', parentID = 'parent' })
+  it('does not set a thinking level for non-reasoning models', function()
+    state.model.set_model('openai/plain-model')
+    stub(config_file, 'get_model_info').returns({ reasoning = false })
 
-    state.renderer.set_messages({
-      {
-        info = {
-          id = 'm1',
-          providerID = 'anthropic',
-          modelID = 'claude-3-opus',
-          mode = 'hidden-xyz',
-        },
-      },
-    })
-
-    local model = agent_model.initialize_current_model({ restore_from_messages = true }):wait()
-
-    assert.equal('anthropic/claude-3-opus', model)
-    assert.equal('anthropic/claude-3-opus', state.current_model)
-    assert.equal('hidden-xyz', state.current_mode)
-
-    state.session.clear_active()
-  end)
-
-  it('does not restore hidden mode from messages for primary sessions', function()
-    state.model.set_model('openai/gpt-4.1')
-    state.model.set_mode('build')
-    state.session.set_active({ id = 'primary' })
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
-
-    state.renderer.set_messages({
-      {
-        info = {
-          id = 'm1',
-          providerID = 'anthropic',
-          modelID = 'claude-3-opus',
-          mode = 'hidden-xyz',
-        },
-      },
-    })
-
-    local model = agent_model.initialize_current_model({ restore_from_messages = true }):wait()
-
-    assert.equal('anthropic/claude-3-opus', model)
-    assert.equal('anthropic/claude-3-opus', state.current_model)
-    assert.equal('build', state.current_mode)
-
-    config_file.get_omp_agents:revert()
-    state.session.clear_active()
-  end)
-
-  it('rejects switch_to_mode in child session', function()
-    state.session.set_active({ id = 'child1', parentID = 'parent1' })
-    state.model.set_mode('build')
-
-    local success = agent_model.switch_to_mode('plan'):wait()
-
-    assert.is_false(success)
-    assert.equal('build', state.current_mode)
-
-    state.session.clear_active()
-  end)
-
-  it('allows switch_to_mode in parent session', function()
-    state.session.set_active({ id = 'parent1' })
-    state.store.set('current_mode', nil)
-    state.store.set('current_model', nil)
-    state.store.set('user_mode_model_map', {})
-
-    stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
-    stub(config_file, 'get_omp_config').returns(Promise.new():resolve({}))
-
-    local success = agent_model.switch_to_mode('plan'):wait()
-
-    assert.is_true(success)
-    assert.equal('plan', state.current_mode)
-
-    config_file.get_omp_agents:revert()
-    config_file.get_omp_config:revert()
-    state.session.clear_active()
+    agent_model.cycle_thinking_level():wait(1000)
+    assert.is_nil(state.current_thinking_level)
   end)
 end)

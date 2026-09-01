@@ -5,28 +5,6 @@ local util = require('omp.util')
 local api = require('omp.api')
 local Promise = require('omp.promise')
 
----Check whether any session id in `delete_ids` is the session itself or an ancestor
----@param session_id string
----@param delete_ids table<string, boolean>
----@param all_sessions Session[]
----@return boolean
-function M._is_session_or_ancestor_deleted(session_id, delete_ids, all_sessions)
-  local session_map = {}
-  for _, s in ipairs(all_sessions) do
-    session_map[s.id] = s
-  end
-
-  local current_id = session_id
-  while current_id do
-    if delete_ids[current_id] then
-      return true
-    end
-    local s = session_map[current_id]
-    current_id = s and s.parentID or nil
-  end
-  return false
-end
-
 ---Format session parts for session picker
 ---@param session Session|GlobalSession object
 ---@param width? integer

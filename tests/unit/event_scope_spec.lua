@@ -47,17 +47,6 @@ describe('event_scope', function()
     }))
   end)
 
-  it('accepts child-session tool parts before the parent task part is indexed', function()
-    assert.is_true(event_scope.should_handle('message.part.updated', {
-      part = {
-        id = 'part_child_tool',
-        messageID = 'message_child',
-        sessionID = 'session_child',
-        type = 'tool',
-      },
-    }))
-  end)
-
   it('keeps legacy interactive ask events visible', function()
     assert.is_true(event_scope.should_handle('permission.asked', {
       id = 'permission_legacy',

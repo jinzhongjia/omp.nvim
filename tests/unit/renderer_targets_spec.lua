@@ -106,7 +106,6 @@ describe('renderer flush formatter context', function()
     ctx.render_state:set_message(message)
     ctx.render_state:set_part(message.parts[1], 1, 1)
     ctx.render_state:set_part(message.parts[2], 2, 2)
-    ctx.render_state:upsert_child_session_part('child_1', { id = 'child_part', type = 'tool' })
     ctx.pending.dirty_part_order = { 'part_1', 'part_2' }
     ctx.pending.dirty_parts = { part_1 = 'msg_1', part_2 = 'msg_1' }
 
@@ -115,8 +114,7 @@ describe('renderer flush formatter context', function()
     assert.stub(cycle_stub).was_called(1)
     assert.equal(2, #contexts)
     assert.is_true(contexts[1].interactive)
-    assert.is_function(contexts[1].get_child_parts)
-    assert.are.same(ctx.render_state:get_child_session_parts('child_1'), contexts[1].get_child_parts('child_1'))
+    assert.is_nil(contexts[1].get_child_parts)
     assert.are.equal(cycle, contexts[1].symbol_cycle)
     assert.are.equal(contexts[1].symbol_cycle, contexts[2].symbol_cycle)
   end)

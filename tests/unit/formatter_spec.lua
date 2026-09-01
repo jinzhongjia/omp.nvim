@@ -63,151 +63,6 @@ describe('formatter', function()
     assert.are.equal('Second line', output.lines[5])
   end)
 
-  it('renders task child question tools with generic summary fallback', function()
-    local message = {
-      info = {
-        id = 'msg_1',
-        role = 'assistant',
-        sessionID = 'ses_1',
-      },
-      parts = {},
-    }
-
-    local part = {
-      id = 'prt_1',
-      type = 'tool',
-      tool = 'task',
-      messageID = 'msg_1',
-      sessionID = 'ses_1',
-      state = {
-        status = 'completed',
-        input = {
-          description = 'review changes',
-          subagent_type = 'explore',
-        },
-        metadata = {
-          sessionId = 'ses_child',
-        },
-        time = {
-          start = 1,
-          ['end'] = 2,
-        },
-      },
-    }
-
-    local child_parts = {
-      {
-        id = 'prt_child_1',
-        type = 'tool',
-        tool = 'question',
-        messageID = 'msg_child_1',
-        sessionID = 'ses_child',
-        state = {
-          status = 'completed',
-          input = {
-            questions = {
-              {
-                question = 'What should we do?',
-                header = 'Question',
-                options = {},
-              },
-            },
-          },
-          metadata = {
-            answers = {
-              { 'Ship it' },
-            },
-          },
-        },
-      },
-    }
-
-    local output = formatter.format_part(part, message, true, {
-      interactive = true,
-      get_child_parts = function(session_id)
-        if session_id == 'ses_child' then
-          return child_parts
-        end
-        return nil
-      end,
-    })
-
-    assert.are.equal(' **  tool** ', output.lines[3])
-  end)
-
-  it('renders task child apply_patch tools without formatter errors', function()
-    local message = {
-      info = {
-        id = 'msg_1',
-        role = 'assistant',
-        sessionID = 'ses_1',
-      },
-      parts = {},
-    }
-
-    local part = {
-      id = 'prt_1',
-      type = 'tool',
-      tool = 'task',
-      messageID = 'msg_1',
-      sessionID = 'ses_1',
-      state = {
-        status = 'completed',
-        input = {
-          description = 'apply changes',
-          subagent_type = 'coder',
-        },
-        metadata = {
-          sessionId = 'ses_child',
-        },
-        time = {
-          start = 1,
-          ['end'] = 2,
-        },
-      },
-    }
-
-    local child_parts = {
-      {
-        id = 'prt_child_1',
-        type = 'tool',
-        tool = 'apply_patch',
-        messageID = 'msg_child_1',
-        sessionID = 'ses_child',
-        state = {
-          status = 'completed',
-          metadata = {
-            files = {
-              {
-                filePath = '/tmp/project/lua/foo.lua',
-              },
-            },
-          },
-        },
-      },
-    }
-
-    local output = formatter.format_part(part, message, true, {
-      interactive = true,
-      get_child_parts = function(session_id)
-        if session_id == 'ses_child' then
-          return child_parts
-        end
-        return nil
-      end,
-    })
-
-    local found = false
-    for _, line in ipairs(output.lines) do
-      if line:find('apply patch', 1, true) then
-        found = true
-        break
-      end
-    end
-
-    assert.is_true(found)
-  end)
-
   it('renders loaded skill name for skill tool calls', function()
     local message = {
       info = {
@@ -722,8 +577,7 @@ describe('formatter', function()
     assert.are.equal('Found `3` matches', output.lines[2])
   end)
 
-  it('renders assistant headers independently of compatibility mode state', function()
-    state.model.set_mode('build')
+  it('renders assistant headers without an agent mode label', function()
     local output = formatter.format_message_header({
       info = {
         id = 'msg_current',
@@ -874,16 +728,11 @@ describe('formatter', function()
     assert.are.equal('ASSISTANT', output.extmarks[1][1].virt_text[3][1])
   end)
 
-  it('anchors task child-session action to the rendered task block', function()
+  it('renders OMP task output without a child-session action', function()
     local message = {
-      info = {
-        id = 'msg_1',
-        role = 'assistant',
-        sessionID = 'ses_1',
-      },
+      info = { id = 'msg_1', role = 'assistant', sessionID = 'ses_1' },
       parts = {},
     }
-
     local part = {
       id = 'prt_task_1',
       type = 'tool',
@@ -892,55 +741,15 @@ describe('formatter', function()
       sessionID = 'ses_1',
       state = {
         status = 'completed',
-        input = {
-          description = 'review changes',
-          subagent_type = 'explore',
-        },
-        metadata = {
-          sessionId = 'ses_child',
-        },
-        time = {
-          start = 1,
-          ['end'] = 2,
-        },
+        input = { description = 'review changes', subagent_type = 'explore' },
+        output = 'review complete',
+        time = { start = 1, ['end'] = 2 },
       },
     }
 
-    local child_parts = {
-      {
-        id = 'prt_child_1',
-        type = 'tool',
-        tool = 'read',
-        messageID = 'msg_child_1',
-        sessionID = 'ses_child',
-        state = {
-          status = 'completed',
-          input = {
-            filePath = '/tmp/project',
-          },
-        },
-      },
-    }
-
-    local output = formatter.format_part(part, message, true, {
-      interactive = true,
-      get_child_parts = function(session_id)
-        if session_id == 'ses_child' then
-          return child_parts
-        end
-        return nil
-      end,
-    })
-
-    assert.are.same({
-      text = '[S] Open this Session',
-      type = 'navigate_session_tree',
-      args = { 'ses_child' },
-      key = 'S',
-      display_line = 1,
-      range = { from = 2, to = 5 },
-    }, output.actions[1])
-    assert.is_truthy(table.concat(output.lines, '\n'):find('read', 1, true))
+    local output = formatter.format_part(part, message, true, { interactive = true })
+    assert.same({}, output.actions)
+    assert.is_truthy(table.concat(output.lines, '\n'):find('review complete', 1, true))
   end)
 
   describe('fold_exclude', function()

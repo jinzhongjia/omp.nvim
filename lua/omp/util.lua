@@ -420,9 +420,9 @@ function M.strdisplaywidth(str)
   return vim.fn.strdisplaywidth(str)
 end
 
---- Parse run command arguments with optional agent, model, variant, and context prefixes.
+--- Parse run command arguments with optional model, thinking level, and context prefixes.
 --- Returns opts table and remaining prompt string.
---- Format: [agent=<name>] [model=<model>] [variant=<variant>] [context=<key=value,...>] <prompt>
+--- Format: [model=<model>] [thinking=<level>] [context=<key=value,...>] <prompt>
 --- Also supports quick context syntax like "#buffer #git_diff" in the prompt
 --- @param args string[]
 --- @return table opts, string prompt
@@ -431,19 +431,15 @@ function M.parse_run_args(args)
   local prompt_start_idx = 1
 
   for i, token in ipairs(args) do
-    local agent = token:match('^agent=(.+)$')
     local model = token:match('^model=(.+)$')
-    local variant = token:match('^variant=(.+)$')
+    local thinking_level = token:match('^thinking=(.+)$')
     local context = token:match('^context=(.+)$')
 
-    if agent then
-      opts.agent = agent
-      prompt_start_idx = i + 1
-    elseif model then
+    if model then
       opts.model = model
       prompt_start_idx = i + 1
-    elseif variant then
-      opts.variant = variant
+    elseif thinking_level then
+      opts.thinking_level = thinking_level
       prompt_start_idx = i + 1
     elseif context then
       opts.context = M.parse_dot_args(context:gsub(',', ' '))

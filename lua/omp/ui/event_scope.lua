@@ -35,16 +35,7 @@ end
 ---@return boolean
 local function active_part(properties)
   local part = properties and properties.part
-  if active_session(part and part.sessionID) then
-    return true
-  end
-
-  -- Task child events may arrive before their parent task part is indexed.
-  return part
-    and state.active_session
-    and part.sessionID
-    and part.sessionID ~= ''
-    and (part.tool ~= nil or part.type == 'tool')
+  return active_session(part and part.sessionID)
 end
 
 ---@param properties table|nil
@@ -88,9 +79,6 @@ local policies = {
     return true
   end,
   ['file.watcher.updated'] = function()
-    return true
-  end,
-  ['custom.restore_point.created'] = function()
     return true
   end,
   ['custom.emit_events.finished'] = function()

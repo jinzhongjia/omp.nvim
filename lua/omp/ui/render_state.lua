@@ -41,10 +41,6 @@ function RenderState:reset()
   self._ranges_valid = false
   self._max_line_end = 0
   self._max_line_end_valid = true
-  self._child_session_parts = {}
-  self._child_session_parts_index = {} -- session_id -> part_id -> list_index
-  self._child_session_task_parts = {}
-  self._task_part_child_sessions = {}
 end
 
 function RenderState:_recompute_max_line_end()
@@ -73,41 +69,6 @@ function RenderState:_get_max_line_end()
     return self:_recompute_max_line_end()
   end
   return self._max_line_end
-end
-
----@param part OmpMessagePart?
----@return string?
-local function get_child_session_id_for_task_part(part)
-  if not part or part.tool ~= 'task' then
-    return nil
-  end
-  local part_state = part.state
-  local metadata = part_state and part_state.metadata
-  return metadata and metadata.sessionId or nil
-end
-
----@param part_id string
-function RenderState:_clear_task_part_child_session(part_id)
-  local child_session_id = self._task_part_child_sessions[part_id]
-  if not child_session_id then
-    return
-  end
-  if self._child_session_task_parts[child_session_id] == part_id then
-    self._child_session_task_parts[child_session_id] = nil
-  end
-  self._task_part_child_sessions[part_id] = nil
-end
-
----@param part_id string
----@param part OmpMessagePart
-function RenderState:_index_task_part_child_session(part_id, part)
-  self:_clear_task_part_child_session(part_id)
-  local child_session_id = get_child_session_id_for_task_part(part)
-  if not child_session_id then
-    return
-  end
-  self._child_session_task_parts[child_session_id] = part_id
-  self._task_part_child_sessions[part_id] = child_session_id
 end
 
 ---@param ranges {[1]: integer, [2]: integer, [3]: string}[]
@@ -174,47 +135,6 @@ end
 function RenderState:_ensure_ranges()
   if not self._ranges_valid then
     self:_rebuild_ranges()
-  end
-end
-
----@param session_id string
----@return OmpMessagePart[]?
-function RenderState:get_child_session_parts(session_id)
-  if not session_id then
-    return nil
-  end
-  return self._child_session_parts[session_id]
-end
-
----@param session_id string
----@return string?
-function RenderState:get_task_part_by_child_session(session_id)
-  if not session_id then
-    return nil
-  end
-  return self._child_session_task_parts[session_id]
-end
-
----@param session_id string
----@param part OmpMessagePart
-function RenderState:upsert_child_session_part(session_id, part)
-  if not session_id or not part or not part.id then
-    return
-  end
-
-  local session_parts = self._child_session_parts[session_id]
-  if not session_parts then
-    session_parts = {}
-    self._child_session_parts[session_id] = session_parts
-    self._child_session_parts_index[session_id] = {}
-  end
-
-  local idx = self._child_session_parts_index[session_id][part.id]
-  if idx then
-    session_parts[idx] = part
-  else
-    session_parts[#session_parts + 1] = part
-    self._child_session_parts_index[session_id][part.id] = #session_parts
   end
 end
 
@@ -643,7 +563,6 @@ function RenderState:set_part(part, line_start, line_end)
     end
   end
 
-  self:_index_task_part_child_session(part_id, part)
   self:_refresh_message_actions(message_id)
 end
 
@@ -703,7 +622,6 @@ function RenderState:update_part_data(part_ref)
   end
   rendered_part.part = part_ref
 
-  self:_index_task_part_child_session(part_ref.id, part_ref)
   self:_refresh_message_actions(rendered_part.message_id)
   return rendered_part
 end
@@ -715,8 +633,6 @@ function RenderState:remove_part(part_id)
   if not part_data then
     return false
   end
-
-  self:_clear_task_part_child_session(part_id)
 
   if not part_data.line_start or not part_data.line_end then
     self._parts[part_id] = nil

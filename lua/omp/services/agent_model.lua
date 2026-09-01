@@ -15,23 +15,19 @@ function M.configure_provider()
       end
       return
     end
-    local model_str = string.format('%s/%s', selection.provider, selection.model)
-    state.model.set_model(model_str)
 
-    if state.current_mode then
-      state.model.set_mode_model_override(state.current_mode, model_str)
-    end
-
+    local model = string.format('%s/%s', selection.provider, selection.model)
+    state.model.set_model(model)
     if state.ui.is_visible() then
       ui.focus_input()
     else
-      log.notify('Changed provider to ' .. model_str, vim.log.levels.INFO)
+      log.notify('Changed model to ' .. model, vim.log.levels.INFO)
     end
   end)
 end
 
-function M.configure_variant()
-  require('omp.variant_picker').select(function(selection)
+function M.configure_thinking_level()
+  require('omp.thinking_level_picker').select(function(selection)
     if not selection then
       if state.ui.is_visible() then
         ui.focus_input()
@@ -39,172 +35,51 @@ function M.configure_variant()
       return
     end
 
-    state.model.set_variant(selection.value)
-
+    state.model.set_thinking_level(selection.value)
     if state.ui.is_visible() then
       ui.focus_input()
     else
-      log.notify('Changed variant to ' .. selection.name, vim.log.levels.INFO)
+      log.notify('Changed thinking level to ' .. selection.name, vim.log.levels.INFO)
     end
   end)
 end
 
-M.cycle_variant = Promise.async(function()
+M.cycle_thinking_level = Promise.async(function()
   if not state.current_model then
     log.notify('No model selected', vim.log.levels.WARN)
     return
   end
 
   local provider, model = state.current_model:match('^(.-)/(.+)$')
-  if not provider or not model then
+  local model_info = provider and model and config_file.get_model_info(provider, model) or nil
+  if not model_info or not model_info.reasoning then
+    log.notify('Current model does not support thinking levels', vim.log.levels.WARN)
     return
   end
 
-  local config_file = require('omp.config_file')
-  local model_info = config_file.get_model_info(provider, model)
-
-  if not model_info or not model_info.variants then
-    log.notify('Current model does not support variants', vim.log.levels.WARN)
-    return
-  end
-
-  local variants = {}
-  for variant_name, _ in pairs(model_info.variants) do
-    table.insert(variants, variant_name)
-  end
-
-  util.sort_by_priority(variants, function(item)
-    return item
-  end, { low = 1, medium = 2, high = 3 })
-
-  if #variants == 0 then
-    return
-  end
-
-  local total_count = #variants + 1
-
-  local current_index
-  if state.current_variant == nil then
-    current_index = total_count
-  else
-    current_index = util.index_of(variants, state.current_variant) or 0
-  end
-
+  local levels = { 'off', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max' }
+  local total_count = #levels + 1
+  local current_index = state.current_thinking_level == nil and total_count
+    or (util.index_of(levels, state.current_thinking_level) or 0)
   local next_index = (current_index % total_count) + 1
+  local next_level = next_index > #levels and nil or levels[next_index]
 
-  local next_variant
-  if next_index > #variants then
-    next_variant = nil
-  else
-    next_variant = variants[next_index]
-  end
-
-  state.model.set_variant(next_variant)
-
-  local model_state = require('omp.model_state')
-  model_state.set_variant(provider, model, next_variant)
+  state.model.set_thinking_level(next_level)
+  require('omp.model_state').set_thinking_level(provider, model, next_level)
 end)
 
---- Apply mode and resolve its associated model from config.
---- No session guards; callers are responsible for validation.
----@param mode string
-local apply_mode = Promise.async(function(mode)
-  state.model.set_mode(mode)
-  local omp_config = config_file.get_omp_config():await() --[[@as OmpConfigFile]]
-
-  local agent_config = omp_config and omp_config.agent or {}
-  local mode_config = agent_config[mode] or {}
-
-  if state.user_mode_model_map[mode] then
-    state.model.set_model(state.user_mode_model_map[mode])
-  elseif mode_config.model and mode_config.model ~= '' then
-    state.model.set_model(mode_config.model)
-  elseif omp_config and omp_config.model and omp_config.model ~= '' then
-    state.model.set_model(omp_config.model)
-  end
-end)
-
-M.switch_to_mode = Promise.async(function(mode)
-  if state.active_session and state.active_session.parentID then
-    log.notify('Cannot switch agent in child session', vim.log.levels.WARN)
-    return false
-  end
-
-  if not mode or mode == '' then
-    log.notify('Mode cannot be empty', vim.log.levels.ERROR)
-    return false
-  end
-
-  local available_agents = config_file.get_omp_agents():await()
-
-  if not vim.tbl_contains(available_agents, mode) then
-    log.notify(
-      string.format('Invalid mode "%s". Available modes: %s', mode, table.concat(available_agents, ', ')),
-      vim.log.levels.ERROR
-    )
-    return false
-  end
-
-  apply_mode(mode):await()
-  return true
-end)
-
-M.ensure_current_mode = Promise.async(function()
-  if state.current_mode == nil then
-    local available_agents = config_file.get_omp_agents():await()
-
-    if not available_agents or #available_agents == 0 then
-      log.notify('No available agents found', vim.log.levels.ERROR)
-      return false
-    end
-
-    local default_mode = require('omp.config').default_mode
-
-    local mode = (default_mode and vim.tbl_contains(available_agents, default_mode))
-        and default_mode
-      or available_agents[1]
-
-    -- Initialize directly; the child-session guard in switch_to_mode
-    -- is for user-initiated changes, not system initialization.
-    apply_mode(mode):await()
-  end
-  return true
-end)
-
----@class InitializeCurrentModelOpts
----@field restore_from_messages? boolean Restore model/mode from the most recent session message
-
----@param opts? InitializeCurrentModelOpts
----@return string|nil The current model
+---@param opts? {restore_from_messages?: boolean}
+---@return Promise<string|nil>
 M.initialize_current_model = Promise.async(function(opts)
   opts = opts or {}
 
   if opts.restore_from_messages and state.messages then
-    -- Child sessions scan forward (first message is reliable);
-    -- parent sessions scan backward (most recent is current choice)
-    local is_child = state.active_session and state.active_session.parentID ~= nil
-    local start_idx, end_idx, step = #state.messages, 1, -1
-    if is_child then
-      start_idx, end_idx, step = 1, #state.messages, 1
-    end
-    for i = start_idx, end_idx, step do
-      local msg = state.messages[i]
-      if msg and msg.info and msg.info.modelID and msg.info.providerID then
-        local model_str = msg.info.providerID .. '/' .. msg.info.modelID
-        if state.current_model ~= model_str then
-          state.model.set_model(model_str)
-        end
-        if msg.info.mode and state.current_mode ~= msg.info.mode then
-          local should_restore_mode = is_child
-          if not should_restore_mode then
-            local available_agents = config_file.get_omp_agents():await()
-            should_restore_mode = vim.tbl_contains(available_agents, msg.info.mode)
-          end
-          if should_restore_mode then
-            state.model.set_mode(msg.info.mode)
-          end
-        end
-        return state.current_model
+    for index = #state.messages, 1, -1 do
+      local info = state.messages[index] and state.messages[index].info
+      if info and info.providerID and info.modelID then
+        local model = info.providerID .. '/' .. info.modelID
+        state.model.set_model(model)
+        return model
       end
     end
   end
@@ -217,7 +92,6 @@ M.initialize_current_model = Promise.async(function(opts)
   if cfg and cfg.model and cfg.model ~= '' then
     state.model.set_model(cfg.model)
   end
-
   return state.current_model
 end)
 

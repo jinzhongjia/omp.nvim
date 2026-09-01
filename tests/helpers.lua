@@ -40,8 +40,6 @@ function M.replay_setup()
     return nil
   end
 
-  state.model.set_mode('build') -- default mode for tests
-
   -- we use the event manager to dispatch events, have to setup before ui.create_windows
   require('omp.event_manager').setup()
 

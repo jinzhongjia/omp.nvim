@@ -90,7 +90,7 @@
         "omp.context.*",
         "omp.history",                // prompt history
         "omp.model_picker",           // model selection UI
-        "omp.variant_picker",         // variant selection UI
+        "omp.thinking_level_picker",  // OMP thinking-level selection UI
         "omp.image_handler",          // clipboard image handling
         "omp.git_review",             // git diff review
         "omp.lsp.*",                  // LSP completion service

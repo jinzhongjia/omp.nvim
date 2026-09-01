@@ -7,13 +7,13 @@ local function get_model_state_path()
   return home .. '/.local/state/omp/model.json'
 end
 
----Load model state (favorites, recent, and variants) in OMP CLI format
+---Load model favorites, recent models, and per-model thinking levels.
 ---@return table
 function M.load()
   local state_path = get_model_state_path()
   local file = io.open(state_path, 'r')
   if not file then
-    return { recent = {}, favorite = {}, variant = {} }
+    return { recent = {}, favorite = {}, thinking_level = {} }
   end
 
   local content = file:read('*a')
@@ -21,17 +21,16 @@ function M.load()
 
   local ok, data = pcall(vim.json.decode, content)
   if not ok or type(data) ~= 'table' then
-    return { recent = {}, favorite = {}, variant = {} }
+    return { recent = {}, favorite = {}, thinking_level = {} }
   end
 
   data.recent = data.recent or {}
   data.favorite = data.favorite or {}
-  data.variant = data.variant or {}
-
+  data.thinking_level = data.thinking_level or {}
   return data
 end
 
----Save model state (favorites, recent, and variants) in OMP CLI format
+---Save model favorites, recent models, and thinking levels.
 ---@param state table
 function M.save(state)
   local state_path = get_model_state_path()
@@ -58,30 +57,23 @@ function M.save(state)
   file:close()
 end
 
----Get the saved variant for a model
+---Get the saved thinking level for a model.
 ---@param provider_id string
 ---@param model_id string
 ---@return string|nil
-function M.get_variant(provider_id, model_id)
+function M.get_thinking_level(provider_id, model_id)
   local state = M.load()
-  local key = provider_id .. '/' .. model_id
-  return state.variant[key]
+  return state.thinking_level[provider_id .. '/' .. model_id]
 end
 
----Save the variant for a model
+---Save the thinking level for a model.
 ---@param provider_id string
 ---@param model_id string
----@param variant_name string|nil
-function M.set_variant(provider_id, model_id, variant_name)
+---@param level string|nil
+function M.set_thinking_level(provider_id, model_id, level)
   local state = M.load()
   local key = provider_id .. '/' .. model_id
-
-  if variant_name then
-    state.variant[key] = variant_name
-  else
-    state.variant[key] = nil
-  end
-
+  state.thinking_level[key] = level
   M.save(state)
 end
 

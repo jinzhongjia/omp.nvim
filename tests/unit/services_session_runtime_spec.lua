@@ -286,7 +286,7 @@ describe('omp.services.session_runtime', function()
   end)
 
   describe('select_session', function()
-    it('filters sessions by title and parentID', function()
+    it('filters sessions by non-empty title', function()
       local mock_sessions = {
         { id = 'session1', title = 'First session', modified = 1, parentID = nil },
         { id = 'session2', title = '', modified = 2, parentID = nil },
@@ -312,57 +312,10 @@ describe('omp.services.session_runtime', function()
       assert.truthy(state.active_session)
       assert.equal('session3', state.active_session.id)
     end)
-
-    it('filters child sessions by parentID', function()
-      local mock_sessions = {
-        { id = 'root1', title = 'Root', modified = 1, parentID = nil },
-        { id = 'child1', title = 'Child 1', modified = 2, parentID = 'root1' },
-        { id = 'child2', title = 'Child 2', modified = 3, parentID = 'root1' },
-        { id = 'child3', title = 'Child of other', modified = 4, parentID = 'root2' },
-      }
-      stub(session, 'get_all_workspace_sessions').invokes(function()
-        return Promise.new():resolve(mock_sessions)
-      end)
-      local passed
-      stub(ui, 'select_session').invokes(function(sessions, cb)
-        passed = sessions
-        cb(nil)
-      end)
-
-      state.ui.set_windows({ input_buf = 1, output_buf = 2 })
-      session_runtime.select_session('root1'):wait()
-      assert.equal(2, #passed)
-      assert.equal('child1', passed[1].id)
-      assert.equal('child2', passed[2].id)
-    end)
   end)
 
   describe('switch_session', function()
     local input_window = require('omp.ui.input_window')
-
-    it('hides input window when switching to a child session', function()
-      state.ui.set_windows({ mock = 'windows', input_buf = 1, output_buf = 2, input_win = 3, output_win = 4 })
-      local orig_is_visible = state.ui.is_visible
-      state.ui.is_visible = function()
-        return true
-      end
-      stub(input_window, 'is_hidden').returns(false)
-      stub(input_window, '_hide')
-
-      session.get_by_id:revert()
-      stub(session, 'get_by_id').invokes(function(id)
-        return Promise.new():resolve({ id = id, title = id, modified = os.time(), parentID = 'parent1' })
-      end)
-
-      session_runtime.switch_session('child1'):wait()
-
-      assert.stub(input_window._hide).was_called()
-      assert.stub(ui.focus_output).was_called()
-
-      input_window.is_hidden:revert()
-      input_window._hide:revert()
-      state.ui.is_visible = orig_is_visible
-    end)
 
     it('shows input window when switching to a non-child session', function()
       state.ui.set_windows({ mock = 'windows', input_buf = 1, output_buf = 2, input_win = 3, output_win = 4 })
@@ -382,31 +335,6 @@ describe('omp.services.session_runtime', function()
       input_window._show:revert()
       state.ui.is_visible = orig_is_visible
     end)
-
-    it('does not hide input when already hidden on child session switch', function()
-      state.ui.set_windows({ mock = 'windows', input_buf = 1, output_buf = 2, input_win = 3, output_win = 4 })
-      local orig_is_visible = state.ui.is_visible
-      state.ui.is_visible = function()
-        return true
-      end
-      stub(input_window, 'is_hidden').returns(true)
-      stub(input_window, '_hide')
-
-      session.get_by_id:revert()
-      stub(session, 'get_by_id').invokes(function(id)
-        return Promise.new():resolve({ id = id, title = id, modified = os.time(), parentID = 'parent1' })
-      end)
-
-      session_runtime.switch_session('child1'):wait()
-
-      assert.stub(input_window._hide).was_not_called()
-      assert.stub(ui.focus_output).was_called()
-
-      input_window.is_hidden:revert()
-      input_window._hide:revert()
-      state.ui.is_visible = orig_is_visible
-    end)
-
   end)
 
   describe('cancel', function()
@@ -429,123 +357,6 @@ describe('omp.services.session_runtime', function()
       assert.same({
         { permission_id = 'per_cancel', payload = { reply = 'reject' } },
       }, replies)
-    end)
-  end)
-
-  describe('child session UI guards', function()
-    local input_window = require('omp.ui.input_window')
-
-    after_each(function()
-      state.session.clear_active()
-    end)
-
-    it('toggle_pane does not show input when in a child session', function()
-      state.session.set_active({ id = 'child1', parentID = 'parent1' })
-      stub(input_window, 'focus_input')
-
-      -- Simulate being in the output window (not input)
-      state.ui.set_windows({
-        input_win = -1,
-        output_win = vim.api.nvim_get_current_win(),
-        input_buf = 1,
-        output_buf = 2,
-      })
-
-      ui.toggle_pane()
-
-      assert.stub(input_window.focus_input).was_not_called()
-      input_window.focus_input:revert()
-    end)
-
-    it('focus_input is a no-op when in a child session', function()
-      state.session.set_active({ id = 'child1', parentID = 'parent1' })
-      stub(input_window, 'is_hidden').returns(true)
-      stub(input_window, '_show')
-
-      ui.focus_input()
-
-      assert.stub(input_window._show).was_not_called()
-      input_window.is_hidden:revert()
-      input_window._show:revert()
-    end)
-
-    it('toggle_pane shows input when child_readonly is false', function()
-      state.session.set_active({ id = 'child1', parentID = 'parent1' })
-      local config = require('omp.config')
-      local orig_readonly = config.values.child_readonly
-      config.values.child_readonly = false
-      stub(input_window, 'focus_input')
-
-      state.ui.set_windows({
-        input_win = -1,
-        output_win = vim.api.nvim_get_current_win(),
-        input_buf = 1,
-        output_buf = 2,
-      })
-
-      ui.toggle_pane()
-
-      assert.stub(input_window.focus_input).was_called()
-      input_window.focus_input:revert()
-      config.values.child_readonly = orig_readonly
-    end)
-
-    it('focus_input works when child_readonly is false', function()
-      state.ui.set_windows({ mock = 'windows', input_buf = 1, output_buf = 2 })
-      state.session.set_active({ id = 'child1', parentID = 'parent1' })
-      local config = require('omp.config')
-      local orig_readonly = config.values.child_readonly
-      config.values.child_readonly = false
-
-      -- Revert the before_each stub so we call the real focus_input
-      ui.focus_input:revert()
-
-      local reached_is_hidden = false
-      local orig_is_hidden = input_window.is_hidden
-      input_window.is_hidden = function()
-        reached_is_hidden = true
-        return true
-      end
-      local orig_show = input_window._show
-      input_window._show = function() end
-
-      ui.focus_input()
-
-      assert.is_true(reached_is_hidden)
-      input_window.is_hidden = orig_is_hidden
-      input_window._show = orig_show
-      config.values.child_readonly = orig_readonly
-      -- Re-stub for after_each cleanup
-      stub(ui, 'focus_input')
-    end)
-
-    it('switch_session does not hide input when child_readonly is false', function()
-      state.ui.set_windows({ mock = 'windows', input_buf = 1, output_buf = 2, input_win = 3, output_win = 4 })
-      local orig_is_visible = state.ui.is_visible
-      state.ui.is_visible = function()
-        return true
-      end
-      local config = require('omp.config')
-      local orig_readonly = config.values.child_readonly
-      config.values.child_readonly = false
-
-      stub(input_window, 'is_hidden').returns(false)
-      stub(input_window, '_hide')
-
-      session.get_by_id:revert()
-      stub(session, 'get_by_id').invokes(function(id)
-        return Promise.new():resolve({ id = id, title = id, modified = os.time(), parentID = 'parent1' })
-      end)
-
-      session_runtime.switch_session('child1'):wait()
-
-      assert.stub(input_window._hide).was_not_called()
-      assert.stub(ui.focus_input).was_called()
-
-      input_window.is_hidden:revert()
-      input_window._hide:revert()
-      state.ui.is_visible = orig_is_visible
-      config.values.child_readonly = orig_readonly
     end)
   end)
 
@@ -962,16 +773,13 @@ describe('omp.services.session_runtime', function()
 
   describe('initialize_current_model', function()
     -- Keep only integration-level guardrails here; detailed behavior stays in services_agent_model_spec.lua.
-    it('keeps the current user-selected model and mode by default', function()
+    it('keeps the current user-selected model by default', function()
       state.model.set_model('openai/gpt-4.1')
-      state.model.set_mode('plan')
       state.renderer.set_messages({
         {
           info = {
-            id = 'm1',
             providerID = 'anthropic',
             modelID = 'claude-3-opus',
-            mode = 'build',
           },
         },
       })
@@ -980,22 +788,15 @@ describe('omp.services.session_runtime', function()
 
       assert.equal('openai/gpt-4.1', model)
       assert.equal('openai/gpt-4.1', state.current_model)
-      assert.equal('plan', state.current_mode)
     end)
 
-    it('restores the latest session model and mode when explicitly requested', function()
+    it('restores the latest session model when explicitly requested', function()
       state.model.set_model('openai/gpt-4.1')
-      state.model.set_mode('plan')
-
-      stub(config_file, 'get_omp_agents').returns(Promise.new():resolve({ 'plan', 'build' }))
-
       state.renderer.set_messages({
         {
           info = {
-            id = 'm1',
             providerID = 'anthropic',
             modelID = 'claude-3-opus',
-            mode = 'build',
           },
         },
       })
@@ -1004,9 +805,6 @@ describe('omp.services.session_runtime', function()
 
       assert.equal('anthropic/claude-3-opus', model)
       assert.equal('anthropic/claude-3-opus', state.current_model)
-      assert.equal('build', state.current_mode)
-
-      config_file.get_omp_agents:revert()
     end)
   end)
 end)

@@ -37,10 +37,6 @@ describe('OMP config adapter', function()
     assert.is_true(get_project_called)
   end)
 
-  it('exposes the single primary OMP mode', function()
-    assert.same({ 'default' }, config_file.get_omp_agents():wait(1000))
-  end)
-
   it('does not synthesize opencode subagents', function()
     assert.same({}, config_file.get_subagents():wait(1000))
   end)

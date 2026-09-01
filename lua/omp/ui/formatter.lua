@@ -93,54 +93,6 @@ function M._format_reasoning(output, part)
   end
 end
 
----Format the revert callout with statistics
----@param session_data OmpMessage[] All messages in the session
----@param start_idx number Index of the message where revert occurred
----@return Output output object representing the lines, extmarks, and actions
-function M._format_revert_message(session_data, start_idx)
-  local output = Output.new()
-  local stats = format_utils.calculate_revert_stats(session_data, start_idx, state.active_session.revert)
-  local message_text = stats.messages == 1 and 'message' or 'messages'
-  local tool_text = stats.tool_calls == 1 and 'tool call' or 'tool calls'
-
-  output:add_line(
-    string.format('> %d %s reverted, %d %s reverted', stats.messages, message_text, stats.tool_calls, tool_text)
-  )
-  output:add_line('>')
-  output:add_line('> type `/redo` to restore.')
-  output:add_empty_line()
-
-  if stats.files and next(stats.files) then
-    for file, fstats in pairs(stats.files) do
-      local file_diff = {}
-      if fstats.additions > 0 then
-        table.insert(file_diff, '+' .. fstats.additions)
-      end
-      if fstats.deletions > 0 then
-        table.insert(file_diff, '-' .. fstats.deletions)
-      end
-      if #file_diff > 0 then
-        local line_str = string.format(icons.get('file') .. '%s: %s', file, table.concat(file_diff, ' '))
-        local line_idx = output:add_line(line_str)
-        local col = #('  ' .. file .. ': ')
-        for _, diff in ipairs(file_diff) do
-          local hl_group = diff:sub(1, 1) == '+' and 'OmpDiffAddText' or 'OmpDiffDeleteText'
-          output:add_extmark(line_idx - 1, {
-            virt_text = { { diff, hl_group } },
-            virt_text_pos = 'inline',
-            virt_text_win_col = col,
-            priority = 1000,
-          } --[[@as OutputExtmark]])
-          col = col + #diff + 1
-        end
-      end
-    end
-  end
-
-  output:add_empty_line()
-  return output
-end
-
 ---@param hidden_count integer
 ---@return Output
 function M._format_hidden_messages_notice(hidden_count)
@@ -178,11 +130,6 @@ end
 ---@return Output
 function M.format_message_header(message, previous_message)
   local output = Output.new()
-
-  if message.info and message.info.id == '__omp_revert_message__' then
-    output:add_lines(M.separator)
-    return output
-  end
 
   if message.info and message.info.id == '__omp_hidden_messages_notice__' then
     return output
@@ -999,12 +946,6 @@ function M.format_part(part, message, is_last_part, context)
       local question_window = require('omp.ui.question_window')
       question_window.format_display(output)
       content_added = true
-    elseif part.type == 'revert-display' then
-      local revert_index = part.state and part.state.revert_index
-      if revert_index then
-        output = M._format_revert_message(state.messages or {}, revert_index)
-        content_added = output:get_line_count() > 0
-      end
     elseif part.type == 'hidden-messages-display' then
       local hidden_count = part.state and part.state.hidden_count
       if type(hidden_count) == 'number' and hidden_count > 0 then

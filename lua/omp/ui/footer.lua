@@ -26,9 +26,9 @@ local function build_right_segments()
 
   if not loading_animation.is_running() and state.current_model and config.ui.display_model then
     table.insert(segments, { state.current_model, 'OmpHint' })
-    if state.current_variant then
+    if state.current_thinking_level then
       table.insert(segments, { '·', 'OmpHint' })
-      table.insert(segments, { state.current_variant, 'OmpVariant' })
+      table.insert(segments, { state.current_thinking_level, 'OmpThinkingLevel' })
     end
     table.insert(segments, { ' ' })
   end
@@ -129,7 +129,7 @@ function M.setup(windows)
 
   -- for model changes
   state.store.subscribe('current_model', on_change)
-  state.store.subscribe('current_variant', on_change)
+  state.store.subscribe('current_thinking_level', on_change)
   state.store.subscribe('active_session', on_change)
   -- to show C-c message
   state.store.subscribe('job_count', on_job_count_changed)
@@ -156,7 +156,7 @@ function M.close(preserve_buffer)
   end
 
   state.store.unsubscribe('current_model', on_change)
-  state.store.unsubscribe('current_variant', on_change)
+  state.store.unsubscribe('current_thinking_level', on_change)
   state.store.unsubscribe('active_session', on_change)
   state.store.unsubscribe('job_count', on_job_count_changed)
 

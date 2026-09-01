@@ -97,32 +97,6 @@ local function get_permission_part(permission)
       end
     end
   end
-
-  if permission and permission.sessionID and permission.sessionID ~= '' then
-    local render_state = require('omp.ui.renderer.ctx').render_state
-    for _, part in ipairs(render_state:get_child_session_parts(permission.sessionID) or {}) do
-      if call_id and call_id ~= '' then
-        if part.callID == call_id then
-          return part
-        end
-      else
-        return part
-      end
-    end
-  end
-end
-
----@param permission OmpPermission|nil
----@return string|nil
-local function get_child_session_id(permission)
-  local session_id = permission and permission.sessionID
-  local active_session = state.active_session
-  if not session_id or session_id == '' or (active_session and active_session.id == session_id) then
-    return nil
-  end
-
-  local render_state = require('omp.ui.renderer.ctx').render_state
-  return render_state:get_task_part_by_child_session(session_id) and session_id or nil
 end
 
 ---Check whether a permission has already been resolved (completed, error, etc.)
@@ -322,18 +296,6 @@ function M.format_display(output)
     unfocused_message = 'Focus Omp window to respond to permission',
     legend_lines = legend_lines,
   })
-
-  local child_session_id = get_child_session_id(permission)
-  if child_session_id then
-    output:add_action({
-      text = '[S] Open this Session',
-      type = 'navigate_session_tree',
-      args = { child_session_id },
-      key = 'S',
-      display_line = dialog_start_line,
-      range = { from = dialog_start_line, to = math.max(dialog_start_line, output:get_line_count() - 1) },
-    })
-  end
 end
 
 function M._setup_dialog()
@@ -364,9 +326,7 @@ function M._setup_dialog()
   end
 
   local function is_active_permission(permission_id)
-    return M._processing
-      and is_current_permission(permission_id)
-      and M._interaction == interaction
+    return M._processing and is_current_permission(permission_id) and M._interaction == interaction
   end
 
   local function on_select(index)

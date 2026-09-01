@@ -653,10 +653,6 @@ end
 
 ---Show the input window by recreating it
 function M._show()
-  if state.active_session and state.active_session.parentID and config.child_readonly then
-    return
-  end
-
   local windows = state.windows
   if not windows or not windows.input_buf or not windows.output_win then
     return

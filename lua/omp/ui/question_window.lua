@@ -161,14 +161,6 @@ local function get_question_part(question_request)
       end
     end
   end
-
-  if question_request and question_request.sessionID and question_request.sessionID ~= '' then
-    local render_state = require('omp.ui.renderer.ctx').render_state
-    return find_matching_question_part(
-      render_state:get_child_session_parts(question_request.sessionID),
-      question_request
-    )
-  end
 end
 
 ---@param question_request OmpQuestionRequest|nil
@@ -644,8 +636,7 @@ local function format_question_tabs(output)
     table.insert(segments, {
       start_col = start_col,
       end_col = #line,
-      hl_group = is_active and 'OmpQuestionTabActive'
-        or (is_done and 'OmpQuestionTabDone' or 'OmpQuestionTabPending'),
+      hl_group = is_active and 'OmpQuestionTabActive' or (is_done and 'OmpQuestionTabDone' or 'OmpQuestionTabPending'),
     })
   end
 

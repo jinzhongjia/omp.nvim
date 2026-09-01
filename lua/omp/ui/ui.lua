@@ -411,10 +411,6 @@ end
 
 ---@param opts? { restore_position?: boolean, start_insert?: boolean }
 function M.focus_input(opts)
-  if state.active_session and state.active_session.parentID and config.child_readonly then
-    return
-  end
-
   opts = opts or {}
   local windows = state.windows
   if not windows then
@@ -493,7 +489,6 @@ function M.clear_output()
   renderer.reset()
   output_window.clear()
   footer.clear()
-  -- state.restore_points = {}
 end
 
 ---Re-render the output buffer from cached session data, avoiding a server round-trip.
@@ -570,9 +565,6 @@ function M.toggle_pane()
   if state.windows and current_win == state.windows.input_win then
     output_window.focus_output(true)
   else
-    if state.active_session and state.active_session.parentID and config.child_readonly then
-      return
-    end
     input_window.focus_input()
   end
 end

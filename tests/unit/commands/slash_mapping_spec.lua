@@ -126,4 +126,19 @@ describe('slash command mapping', function()
     assert.equal('command build --fast', captured_parsed[1].intent.source.raw_args)
     assert.equal(1, #captured_ctx)
   end)
+
+  it('deduplicates native OMP commands against plugin commands', function()
+    user_commands = {
+      compact = { description = 'Native compact' },
+      review = { description = 'Native review' },
+    }
+
+    local counts = {}
+    for _, entry in ipairs(slash.get_commands():wait()) do
+      counts[entry.slash_cmd] = (counts[entry.slash_cmd] or 0) + 1
+    end
+
+    assert.equals(1, counts['/compact'])
+    assert.equals(1, counts['/review'])
+  end)
 end)

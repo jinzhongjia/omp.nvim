@@ -81,20 +81,11 @@ M.get_all_global_sessions = Promise.async(function()
   return sessions
 end)
 
----Get the most recent main workspace session
+---Get the most recent workspace session.
 ---@return Session|nil
 M.get_last_workspace_session = Promise.async(function()
   local sessions = M.get_all_workspace_sessions():await()
-  ---@cast sessions Session[]|nil
-  if not sessions then
-    return nil
-  end
-
-  local main_sessions = vim.tbl_filter(function(session)
-    return session.parentID == nil --- we don't want child sessions
-  end, sessions)
-
-  return main_sessions[1]
+  return sessions and sessions[1] or nil
 end)
 
 ---Get a session by its id

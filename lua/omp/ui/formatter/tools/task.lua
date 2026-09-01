@@ -24,7 +24,7 @@ end
 ---@param output Output
 ---@param part OmpMessagePart
 ---@param context? FormatterContext
-function M.format(output, part, context)
+function M.format(output, part, _context)
   if part.tool ~= 'task' then
     return
   end
@@ -48,25 +48,6 @@ function M.format(output, part, context)
 
   local output_start_line = output:get_line_count() + 1
   if config.ui.output.tools.show_output or config.ui.output.tools.use_folds then
-    local child_session_id = metadata.sessionId
-    local child_parts = child_session_id
-      and context
-      and context.get_child_parts
-      and context.get_child_parts(child_session_id)
-
-    if child_parts and #child_parts > 0 then
-      output:add_empty_line()
-
-      for _, item in ipairs(child_parts) do
-        if item.tool then
-          local status = item.state and item.state.status or 'pending'
-          output:add_line(' ' .. M.tool_action_line(item, status, utils))
-        end
-      end
-
-      output:add_empty_line()
-    end
-
     if tool_output ~= '' then
       local clean_output = tool_output:gsub('<task_result>', ''):gsub('</task_result>', '')
       if clean_output ~= '' then
@@ -81,18 +62,6 @@ function M.format(output, part, context)
       config.ui.output.tools.show_output,
       config.ui.output.tools.use_folds
     )
-  end
-
-  local end_line = output:get_line_count()
-  if metadata.sessionId then
-    output:add_action({
-      text = '[S] Open this Session',
-      type = 'navigate_session_tree',
-      args = { metadata.sessionId },
-      key = 'S',
-      display_line = start_line,
-      range = { from = start_line + 1, to = end_line + 1 },
-    })
   end
 end
 
