@@ -87,6 +87,122 @@ local function tool_part(session_id, message_id, tool_call_id, tool, args, statu
   }
 end
 
+---@param value string
+---@param prefix string
+---@return boolean
+local function starts_with(value, prefix)
+  return value:sub(1, #prefix) == prefix
+end
+
+---@param text string
+---@param session_id string
+---@param message_id string
+---@param block_index integer
+---@return table[]|nil
+local function restored_user_parts(text, session_id, message_id, block_index)
+  if not text:find('<context', 1, true) and not text:find('<system>', 1, true) then
+    return nil
+  end
+
+  local parts = {}
+  local restored = false
+  local sequence = 0
+
+  ---@param part table
+  local function add_part(part)
+    sequence = sequence + 1
+    part.id = string.format('%s-restored-%d-%d', message_id, block_index, sequence)
+    part.messageID = message_id
+    part.sessionID = session_id
+    table.insert(parts, part)
+  end
+
+  ---@param remaining string
+  ---@param last integer
+  ---@return string
+  local function after_chunk(remaining, last)
+    local next_index = last + 1
+    if remaining:sub(next_index, next_index + 1) == '\n\n' then
+      next_index = next_index + 2
+    end
+    return remaining:sub(next_index)
+  end
+
+  local remaining = text
+  while remaining ~= '' do
+    local _, file_end, path = remaining:find('^<context file="([^"]*)">Referenced file</context>')
+    if file_end then
+      add_part({
+        type = 'file',
+        filename = path,
+        url = 'file://' .. path,
+        source = { path = path },
+      })
+      restored = true
+      remaining = after_chunk(remaining, file_end)
+    else
+      local _, agent_end, name = remaining:find('^<context agent="([^"]*)">Referenced subagent</context>')
+      if agent_end then
+        add_part({
+          type = 'agent',
+          name = name,
+          source = { path = name },
+        })
+        restored = true
+        remaining = after_chunk(remaining, agent_end)
+      elseif starts_with(remaining, '<system>\n') then
+        local close_start, close_end = remaining:find('\n</system>', #'<system>\n' + 1, true)
+        if not close_start then
+          break
+        end
+        restored = true
+        remaining = after_chunk(remaining, close_end)
+      elseif starts_with(remaining, '<context') then
+        local opening_end = remaining:find('>\n', 1, true)
+        local close_start, close_end
+        if opening_end then
+          close_start, close_end = remaining:find('\n</context>', opening_end + 2, true)
+        end
+        if not opening_end or not close_start then
+          break
+        end
+        local opening = remaining:sub(1, opening_end)
+        local context_type = opening:match('^<context type="([^"]+)">$')
+        if opening ~= '<context>' and not context_type then
+          break
+        end
+        add_part({
+          type = 'text',
+          text = remaining:sub(opening_end + 2, close_start - 1),
+          synthetic = true,
+          metadata = context_type and { context_type = context_type } or nil,
+        })
+        restored = true
+        remaining = after_chunk(remaining, close_end)
+      else
+        local context_start = remaining:find('\n\n<context', 1, true)
+        local system_start = remaining:find('\n\n<system>\n', 1, true)
+        local boundary
+        if context_start and system_start then
+          boundary = math.min(context_start, system_start)
+        else
+          boundary = context_start or system_start
+        end
+        local plain = boundary and remaining:sub(1, boundary - 1) or remaining
+        if plain ~= '' then
+          add_part({ type = 'text', text = plain })
+        end
+        remaining = boundary and remaining:sub(boundary + 2) or ''
+      end
+    end
+  end
+
+  if remaining ~= '' then
+    add_part({ type = 'text', text = remaining })
+  end
+  return restored and parts or nil
+end
+
 local function content_parts(message, session_id, message_id)
   local result = {}
   local content = message and message.content
@@ -99,13 +215,19 @@ local function content_parts(message, session_id, message_id)
     end
     if type(block) == 'table' then
       if block.type == 'text' then
-        table.insert(result, {
-          id = string.format('%s-text-%d', message_id, index),
-          messageID = message_id,
-          sessionID = session_id,
-          type = 'text',
-          text = block.text or '',
-        })
+        local restored = message.role == 'user' and restored_user_parts(block.text or '', session_id, message_id, index)
+          or nil
+        if restored then
+          vim.list_extend(result, restored)
+        else
+          table.insert(result, {
+            id = string.format('%s-text-%d', message_id, index),
+            messageID = message_id,
+            sessionID = session_id,
+            type = 'text',
+            text = block.text or '',
+          })
+        end
       elseif block.type == 'thinking' then
         table.insert(result, {
           id = string.format('%s-reasoning-%d', message_id, index),

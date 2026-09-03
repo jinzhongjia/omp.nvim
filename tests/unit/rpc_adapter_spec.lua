@@ -155,4 +155,45 @@ describe('omp RPC adapter', function()
       })
     )
   end)
+
+  it('restores serialized user context into renderer parts', function()
+    local selection = vim.json.encode({
+      context_type = 'selection',
+      content = '`````zig\nstd.mem.indexOfScalar\n`````',
+      lines = '52, 52',
+      file = { name = 'browser.zig', path = '/tmp/browser.zig' },
+    })
+    local content = '<context file="/tmp/browser.zig">Referenced file</context>'
+      .. '\n\n<context type="selection">\n'
+      .. selection
+      .. '\n</context>\n\n这段代码干什么的'
+
+    local function assert_parts(parts)
+      assert.equals(3, #parts)
+      assert.equals('file', parts[1].type)
+      assert.equals('/tmp/browser.zig', parts[1].filename)
+      assert.equals('text', parts[2].type)
+      assert.is_true(parts[2].synthetic)
+      assert.equals('selection', parts[2].metadata.context_type)
+      assert.equals(selection, parts[2].text)
+      assert.equals('这段代码干什么的', parts[3].text)
+      assert.is_nil(parts[3].text:find('<context', 1, true))
+    end
+
+    local adapter = Adapter.new({ session_id = 'session-1' })
+    local events = adapter:handle({
+      type = 'message_start',
+      message = { id = 'message-1', role = 'user', content = content },
+    })
+    assert_parts({
+      events[2].properties.part,
+      events[3].properties.part,
+      events[4].properties.part,
+    })
+
+    local persisted = Adapter.convert_messages({
+      { id = 'message-1', role = 'user', content = content },
+    }, 'session-1')
+    assert_parts(persisted[1].parts)
+  end)
 end)
